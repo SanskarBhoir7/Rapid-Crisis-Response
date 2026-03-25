@@ -31,10 +31,24 @@ beforeEach(() => {
       });
     }
 
+    if (url.includes('/bridge_events')) {
+      return Promise.resolve({
+        ok: true,
+        json: async () => ([])
+      });
+    }
+
     if (url.includes('/get_sos_data')) {
       return Promise.resolve({
         ok: true,
         json: async () => ([])
+      });
+    }
+
+    if (url.includes('/panic_alert')) {
+      return Promise.resolve({
+        ok: true,
+        json: async () => ({})
       });
     }
 

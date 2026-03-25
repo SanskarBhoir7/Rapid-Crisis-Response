@@ -15,6 +15,7 @@ CORS(app)
 
 # --- Configuration ---
 PROCESSED_DATA_FILE = "processed_data.json"
+BRIDGE_EVENTS_FILE = "bridge_events.json"
 RESCUE_HQ_COORDS = "18.9486,72.8336"
 GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
 EMERGENCY_WEBHOOK_URL = os.getenv("EMERGENCY_WEBHOOK_URL")
@@ -61,6 +62,8 @@ def _normalize_incident(incident):
     incident["floor"] = incident.get("floor") or "Unknown"
     incident["room_or_zone"] = incident.get("room_or_zone") or "Unknown"
     incident["reporter_type"] = incident.get("reporter_type") or "Guest"
+    incident["source"] = incident.get("source") or "manual_report"
+    incident["channel"] = incident.get("channel") or "dashboard"
     try:
         incident["affected_people_count"] = int(incident.get("affected_people_count", 1))
     except (ValueError, TypeError):
@@ -109,13 +112,64 @@ def _classify_incident_from_description(description):
 def _load_incidents():
     if not os.path.exists(PROCESSED_DATA_FILE):
         return []
-    with open(PROCESSED_DATA_FILE, 'r', encoding='utf-8') as f:
-        return json.load(f)
+    try:
+        with open(PROCESSED_DATA_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    except json.JSONDecodeError as e:
+        raise ValueError(f"Processed incidents file is invalid JSON: {e}") from e
 
 
 def _save_incidents(incidents):
-    with open(PROCESSED_DATA_FILE, 'w', encoding='utf-8') as f:
+    temp_file = f"{PROCESSED_DATA_FILE}.tmp"
+    with open(temp_file, 'w', encoding='utf-8') as f:
         json.dump(incidents, f, indent=4)
+    os.replace(temp_file, PROCESSED_DATA_FILE)
+
+
+def _load_bridge_events():
+    if not os.path.exists(BRIDGE_EVENTS_FILE):
+        return []
+    with open(BRIDGE_EVENTS_FILE, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+
+def _save_bridge_events(events):
+    temp_file = f"{BRIDGE_EVENTS_FILE}.tmp"
+    with open(temp_file, 'w', encoding='utf-8') as f:
+        json.dump(events, f, indent=4)
+    os.replace(temp_file, BRIDGE_EVENTS_FILE)
+
+
+def _record_bridge_event(event_type, incident, delivery):
+    try:
+        events = _load_bridge_events()
+    except (json.JSONDecodeError, FileNotFoundError):
+        events = []
+
+    bridge_event = {
+        "id": int(time.time() * 1000),
+        "event_type": event_type,
+        "timestamp": datetime.now().isoformat(),
+        "delivery_status": "delivered" if delivery.get("delivered") else ("mocked" if delivery.get("mode") == "mock" else "failed"),
+        "delivery_mode": delivery.get("mode", "unknown"),
+        "status_code": delivery.get("status_code"),
+        "reason": delivery.get("reason"),
+        "error": delivery.get("error"),
+        "incident": {
+            "id": incident.get("id"),
+            "status": incident.get("status"),
+            "priority": incident.get("priority"),
+            "category": incident.get("category"),
+            "summary": incident.get("summary") or incident.get("original_message"),
+            "venue_name": incident.get("venue_name"),
+            "floor": incident.get("floor"),
+            "room_or_zone": incident.get("room_or_zone"),
+            "assigned_vehicle": incident.get("assigned_vehicle")
+        }
+    }
+
+    events.insert(0, bridge_event)
+    _save_bridge_events(events[:100])
 
 
 def _send_emergency_bridge_event(event_type, incident):
@@ -145,24 +199,28 @@ def _send_emergency_bridge_event(event_type, incident):
 
     if not EMERGENCY_WEBHOOK_URL:
         print(f"[Bridge] EMERGENCY_WEBHOOK_URL not configured. Mock sent: {event_type} for incident {incident.get('id')}")
-        return {"delivered": False, "mode": "mock", "reason": "webhook_not_configured"}
+        result = {"delivered": False, "mode": "mock", "reason": "webhook_not_configured"}
+        _record_bridge_event(event_type, incident, result)
+        return result
 
     try:
         response = requests.post(EMERGENCY_WEBHOOK_URL, json=payload, timeout=8)
         response.raise_for_status()
-        return {"delivered": True, "mode": "webhook", "status_code": response.status_code}
+        result = {"delivered": True, "mode": "webhook", "status_code": response.status_code}
+        _record_bridge_event(event_type, incident, result)
+        return result
     except requests.exceptions.RequestException as e:
         print(f"[Bridge] Failed to send webhook event: {e}")
-        return {"delivered": False, "mode": "webhook", "error": str(e)}
+        result = {"delivered": False, "mode": "webhook", "error": str(e)}
+        _record_bridge_event(event_type, incident, result)
+        return result
 
 # --- API Endpoints ---
 @app.route('/get_sos_data', methods=['GET'])
 def get_sos_data():
-    # This function remains the same...
     print("\n--- Received request for SOS data ---")
     try:
-        with open(PROCESSED_DATA_FILE, 'r', encoding='utf-8') as f:
-            all_data = json.load(f)
+        all_data = _load_incidents()
         normalized_data = [_normalize_incident(item) for item in all_data]
         filtered_data = [
             item for item in normalized_data
@@ -173,8 +231,8 @@ def get_sos_data():
         return jsonify(sorted_data)
     except FileNotFoundError:
         return jsonify({"error": "Processed data file not found. Run the pre-processing script."}), 500
-    except json.JSONDecodeError:
-        return jsonify({"error": "Failed to decode the processed data file."}), 500
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/get_situation_update', methods=['GET'])
 def get_situation_update():
@@ -193,6 +251,25 @@ def bridge_status():
         "mode": mode,
         "webhook_configured": bool(EMERGENCY_WEBHOOK_URL)
     })
+
+
+@app.route('/bridge_events', methods=['GET'])
+def bridge_events():
+    try:
+        limit = int(request.args.get('limit', 12))
+    except ValueError:
+        limit = 12
+
+    limit = max(1, min(limit, 50))
+
+    try:
+        events = _load_bridge_events()
+    except FileNotFoundError:
+        events = []
+    except json.JSONDecodeError:
+        return jsonify({"error": "Failed to decode bridge events log."}), 500
+
+    return jsonify(events[:limit])
 
 @app.route('/get_route', methods=['GET'])
 def get_route():
@@ -331,6 +408,8 @@ def report_incident():
         "floor": floor,
         "room_or_zone": room_or_zone,
         "reporter_type": reporter_type,
+        "source": "manual_report",
+        "channel": "dashboard_form",
         "affected_people_count": affected_people_count,
         "authenticity_score": 10, # User reported is generally high for demo
         "reasoning": "Direct verified report from user on ground.",
@@ -368,6 +447,89 @@ def report_incident():
 
     except Exception as e:
         print(f"Error saving incident: {e}")
+        return jsonify({"error": "Internal Server Error"}), 500
+
+
+@app.route('/panic_alert', methods=['POST'])
+def panic_alert():
+    data = request.json or {}
+    print(f"Received panic alert: {data}")
+
+    if 'lat' not in data or 'lng' not in data:
+        return jsonify({"error": "Missing required fields (lat, lng)"}), 400
+
+    try:
+        lat = float(data['lat'])
+        lng = float(data['lng'])
+    except (ValueError, TypeError):
+        return jsonify({"error": "Latitude and longitude must be valid numbers."}), 400
+
+    venue_name = str(data.get('venue_name') or "Unknown Venue").strip()
+    floor = str(data.get('floor') or "Unknown").strip()
+    room_or_zone = str(data.get('room_or_zone') or "Unknown").strip()
+    reporter_type = str(data.get('reporter_type') or "Staff").strip()
+    if reporter_type not in ["Guest", "Staff", "Security"]:
+        reporter_type = "Staff"
+
+    generated_id = int(time.time() * 1000)
+    timestamp = datetime.now().isoformat()
+    panic_code = str(data.get('panic_code') or 'PANIC-01').strip()
+    description = str(data.get('description') or "Silent panic button triggered. Immediate coordination required.").strip()
+    try:
+        affected_people_count = int(data.get('affected_people_count', 1))
+    except (ValueError, TypeError):
+        affected_people_count = 1
+    if affected_people_count < 1:
+        affected_people_count = 1
+
+    new_incident = {
+        "id": generated_id,
+        "original_message": description,
+        "category": "Panic Alert",
+        "priority": "Critical",
+        "urgency": "Life-threatening",
+        "need_type": ["Police", "Medical"],
+        "summary": f"Panic button activated at {venue_name}",
+        "severity_score": 10,
+        "coordinates": {
+            "lat": lat,
+            "lng": lng
+        },
+        "location": "Panic Button Trigger",
+        "location_text": f"{venue_name} {floor} {room_or_zone}".strip(),
+        "venue_name": venue_name,
+        "floor": floor,
+        "room_or_zone": room_or_zone,
+        "reporter_type": reporter_type,
+        "source": "panic_button",
+        "channel": "silent_alarm",
+        "panic_code": panic_code,
+        "affected_people_count": affected_people_count,
+        "authenticity_score": 10,
+        "reasoning": "Direct panic trigger from hospitality staff channel.",
+        "flags": [],
+        "status": "Created",
+        "status_timeline": [
+            {
+                "status": "Created",
+                "timestamp": timestamp,
+                "actor": "panic-button",
+                "note": f"Panic alert triggered via {panic_code}"
+            }
+        ],
+        "timestamp": timestamp
+    }
+
+    try:
+        current_data = _load_incidents()
+        normalized_incident = _normalize_incident(new_incident)
+        current_data.insert(0, normalized_incident)
+        _send_emergency_bridge_event("panic_alert_triggered", normalized_incident)
+        _save_incidents(current_data)
+        print("Panic alert saved successfully.")
+        return jsonify({"message": "Panic alert created", "incident": normalized_incident})
+    except Exception as e:
+        print(f"Error saving panic alert: {e}")
         return jsonify({"error": "Internal Server Error"}), 500
 
 

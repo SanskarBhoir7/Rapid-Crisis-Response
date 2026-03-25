@@ -1,0 +1,443 @@
+[
+    {
+        "id": 1774453155870,
+        "event_type": "incident_resolved",
+        "timestamp": "2026-03-25T21:09:15.870236",
+        "delivery_status": "mocked",
+        "delivery_mode": "mock",
+        "status_code": null,
+        "reason": "webhook_not_configured",
+        "error": null,
+        "incident": {
+            "id": 1774453083635,
+            "status": "Resolved",
+            "priority": "Critical",
+            "category": "Panic Alert",
+            "summary": "Panic button activated at Hospitality Venue",
+            "venue_name": "Hospitality Venue",
+            "floor": "Unknown",
+            "room_or_zone": "Panic Trigger Zone",
+            "assigned_vehicle": "amb-2"
+        }
+    },
+    {
+        "id": 1774453152656,
+        "event_type": "incident_on_scene",
+        "timestamp": "2026-03-25T21:09:12.656681",
+        "delivery_status": "mocked",
+        "delivery_mode": "mock",
+        "status_code": null,
+        "reason": "webhook_not_configured",
+        "error": null,
+        "incident": {
+            "id": 1774453083635,
+            "status": "On Scene",
+            "priority": "Critical",
+            "category": "Panic Alert",
+            "summary": "Panic button activated at Hospitality Venue",
+            "venue_name": "Hospitality Venue",
+            "floor": "Unknown",
+            "room_or_zone": "Panic Trigger Zone",
+            "assigned_vehicle": "amb-2"
+        }
+    },
+    {
+        "id": 1774453122910,
+        "event_type": "incident_dispatched",
+        "timestamp": "2026-03-25T21:08:42.910761",
+        "delivery_status": "mocked",
+        "delivery_mode": "mock",
+        "status_code": null,
+        "reason": "webhook_not_configured",
+        "error": null,
+        "incident": {
+            "id": 1774453083635,
+            "status": "Dispatched",
+            "priority": "Critical",
+            "category": "Panic Alert",
+            "summary": "Panic button activated at Hospitality Venue",
+            "venue_name": "Hospitality Venue",
+            "floor": "Unknown",
+            "room_or_zone": "Panic Trigger Zone",
+            "assigned_vehicle": "amb-2"
+        }
+    },
+    {
+        "id": 1774453083651,
+        "event_type": "panic_alert_triggered",
+        "timestamp": "2026-03-25T21:08:03.651858",
+        "delivery_status": "mocked",
+        "delivery_mode": "mock",
+        "status_code": null,
+        "reason": "webhook_not_configured",
+        "error": null,
+        "incident": {
+            "id": 1774453083635,
+            "status": "Created",
+            "priority": "Critical",
+            "category": "Panic Alert",
+            "summary": "Panic button activated at Hospitality Venue",
+            "venue_name": "Hospitality Venue",
+            "floor": "Unknown",
+            "room_or_zone": "Panic Trigger Zone",
+            "assigned_vehicle": null
+        }
+    },
+    {
+        "id": 1774453072805,
+        "event_type": "incident_dispatched",
+        "timestamp": "2026-03-25T21:07:52.805178",
+        "delivery_status": "mocked",
+        "delivery_mode": "mock",
+        "status_code": null,
+        "reason": "webhook_not_configured",
+        "error": null,
+        "incident": {
+            "id": 43,
+            "status": "Dispatched",
+            "priority": "Moderate",
+            "category": "Animal Rescue",
+            "summary": "SOS! Stray leopard spotted near residential complex. at Borivali National Park.",
+            "venue_name": "Unknown Venue",
+            "floor": "Unknown",
+            "room_or_zone": "Unknown",
+            "assigned_vehicle": "pol-1"
+        }
+    },
+    {
+        "id": 1774453070646,
+        "event_type": "incident_dispatched",
+        "timestamp": "2026-03-25T21:07:50.646777",
+        "delivery_status": "mocked",
+        "delivery_mode": "mock",
+        "status_code": null,
+        "reason": "webhook_not_configured",
+        "error": null,
+        "incident": {
+            "id": 6,
+            "status": "Dispatched",
+            "priority": "Moderate",
+            "category": "Tree Fall",
+            "summary": "SOS! Huge tree fell on a parked car, blocking traffic. at Andheri Station.",
+            "venue_name": "Unknown Venue",
+            "floor": "Unknown",
+            "room_or_zone": "Unknown",
+            "assigned_vehicle": "pol-1"
+        }
+    },
+    {
+        "id": 1774453068284,
+        "event_type": "incident_dispatched",
+        "timestamp": "2026-03-25T21:07:48.284273",
+        "delivery_status": "mocked",
+        "delivery_mode": "mock",
+        "status_code": null,
+        "reason": "webhook_not_configured",
+        "error": null,
+        "incident": {
+            "id": 31,
+            "status": "Dispatched",
+            "priority": "High",
+            "category": "Flooding",
+            "summary": "SOS! Water logging blocking main access road. at Gateway of India.",
+            "venue_name": "Unknown Venue",
+            "floor": "Unknown",
+            "room_or_zone": "Unknown",
+            "assigned_vehicle": "pol-1"
+        }
+    },
+    {
+        "id": 1774453066769,
+        "event_type": "incident_dispatched",
+        "timestamp": "2026-03-25T21:07:46.769599",
+        "delivery_status": "mocked",
+        "delivery_mode": "mock",
+        "status_code": null,
+        "reason": "webhook_not_configured",
+        "error": null,
+        "incident": {
+            "id": 7,
+            "status": "Dispatched",
+            "priority": "Moderate",
+            "category": "Animal Rescue",
+            "summary": "SOS! Stray leopard spotted near residential complex. at Vikhroli Station.",
+            "venue_name": "Unknown Venue",
+            "floor": "Unknown",
+            "room_or_zone": "Unknown",
+            "assigned_vehicle": "pol-1"
+        }
+    },
+    {
+        "id": 1774453064019,
+        "event_type": "incident_dispatched",
+        "timestamp": "2026-03-25T21:07:44.020529",
+        "delivery_status": "mocked",
+        "delivery_mode": "mock",
+        "status_code": null,
+        "reason": "webhook_not_configured",
+        "error": null,
+        "incident": {
+            "id": 19,
+            "status": "Dispatched",
+            "priority": "Moderate",
+            "category": "Animal Rescue",
+            "summary": "SOS! Stray leopard spotted near residential complex. at Powai Lake.",
+            "venue_name": "Unknown Venue",
+            "floor": "Unknown",
+            "room_or_zone": "Unknown",
+            "assigned_vehicle": "pol-1"
+        }
+    },
+    {
+        "id": 1774453032549,
+        "event_type": "incident_dispatched",
+        "timestamp": "2026-03-25T21:07:12.549941",
+        "delivery_status": "mocked",
+        "delivery_mode": "mock",
+        "status_code": null,
+        "reason": "webhook_not_configured",
+        "error": null,
+        "incident": {
+            "id": 29,
+            "status": "Dispatched",
+            "priority": "High",
+            "category": "Accident",
+            "summary": "SOS! Car collision with multiple injuries reported. at Goregaon Hub Mall.",
+            "venue_name": "Unknown Venue",
+            "floor": "Unknown",
+            "room_or_zone": "Unknown",
+            "assigned_vehicle": "amb-1"
+        }
+    },
+    {
+        "id": 1774453032451,
+        "event_type": "incident_dispatched",
+        "timestamp": "2026-03-25T21:07:12.451699",
+        "delivery_status": "mocked",
+        "delivery_mode": "mock",
+        "status_code": null,
+        "reason": "webhook_not_configured",
+        "error": null,
+        "incident": {
+            "id": 13,
+            "status": "Dispatched",
+            "priority": "Critical",
+            "category": "Structure Collapse",
+            "summary": "SOS! Old building collapsed, people trapped under debris. at Lower Parel.",
+            "venue_name": "Unknown Venue",
+            "floor": "Unknown",
+            "room_or_zone": "Unknown",
+            "assigned_vehicle": "fire-1"
+        }
+    },
+    {
+        "id": 1774453032366,
+        "event_type": "incident_dispatched",
+        "timestamp": "2026-03-25T21:07:12.366154",
+        "delivery_status": "mocked",
+        "delivery_mode": "mock",
+        "status_code": null,
+        "reason": "webhook_not_configured",
+        "error": null,
+        "incident": {
+            "id": 16,
+            "status": "Dispatched",
+            "priority": "High",
+            "category": "Accident",
+            "summary": "SOS! Car collision with multiple injuries reported. at Colaba Causeway.",
+            "venue_name": "Unknown Venue",
+            "floor": "Unknown",
+            "room_or_zone": "Unknown",
+            "assigned_vehicle": "amb-2"
+        }
+    },
+    {
+        "id": 1774453032291,
+        "event_type": "incident_dispatched",
+        "timestamp": "2026-03-25T21:07:12.291870",
+        "delivery_status": "mocked",
+        "delivery_mode": "mock",
+        "status_code": null,
+        "reason": "webhook_not_configured",
+        "error": null,
+        "incident": {
+            "id": 28,
+            "status": "Dispatched",
+            "priority": "Critical",
+            "category": "Gas Leak",
+            "summary": "SOS! Toxic gas smell reported near residential area. at Colaba Causeway.",
+            "venue_name": "Unknown Venue",
+            "floor": "Unknown",
+            "room_or_zone": "Unknown",
+            "assigned_vehicle": "fire-1"
+        }
+    },
+    {
+        "id": 1774453032242,
+        "event_type": "incident_dispatched",
+        "timestamp": "2026-03-25T21:07:12.242692",
+        "delivery_status": "mocked",
+        "delivery_mode": "mock",
+        "status_code": null,
+        "reason": "webhook_not_configured",
+        "error": null,
+        "incident": {
+            "id": 40,
+            "status": "Dispatched",
+            "priority": "Critical",
+            "category": "Gas Leak",
+            "summary": "SOS! Toxic gas smell reported near residential area. at R City Mall.",
+            "venue_name": "Unknown Venue",
+            "floor": "Unknown",
+            "room_or_zone": "Unknown",
+            "assigned_vehicle": "fire-1"
+        }
+    },
+    {
+        "id": 1774453032159,
+        "event_type": "incident_dispatched",
+        "timestamp": "2026-03-25T21:07:12.159042",
+        "delivery_status": "mocked",
+        "delivery_mode": "mock",
+        "status_code": null,
+        "reason": "webhook_not_configured",
+        "error": null,
+        "incident": {
+            "id": 39,
+            "status": "Dispatched",
+            "priority": "Critical",
+            "category": "Fire",
+            "summary": "SOS! Massive fire broke out in a commercial building. at Vikhroli Station.",
+            "venue_name": "Unknown Venue",
+            "floor": "Unknown",
+            "room_or_zone": "Unknown",
+            "assigned_vehicle": "fire-1"
+        }
+    },
+    {
+        "id": 1774453032112,
+        "event_type": "incident_dispatched",
+        "timestamp": "2026-03-25T21:07:12.112002",
+        "delivery_status": "mocked",
+        "delivery_mode": "mock",
+        "status_code": null,
+        "reason": "webhook_not_configured",
+        "error": null,
+        "incident": {
+            "id": 23,
+            "status": "Dispatched",
+            "priority": "Critical",
+            "category": "Gas Leak",
+            "summary": "SOS! Toxic gas smell reported near residential area. at Dadar Station.",
+            "venue_name": "Unknown Venue",
+            "floor": "Unknown",
+            "room_or_zone": "Unknown",
+            "assigned_vehicle": "fire-1"
+        }
+    },
+    {
+        "id": 1774453032015,
+        "event_type": "incident_dispatched",
+        "timestamp": "2026-03-25T21:07:12.015105",
+        "delivery_status": "mocked",
+        "delivery_mode": "mock",
+        "status_code": null,
+        "reason": "webhook_not_configured",
+        "error": null,
+        "incident": {
+            "id": 9,
+            "status": "Dispatched",
+            "priority": "Critical",
+            "category": "Medical Emergency",
+            "summary": "SOS! Severe cardiac arrest patient collapsed on road. at Marine Drive.",
+            "venue_name": "Unknown Venue",
+            "floor": "Unknown",
+            "room_or_zone": "Unknown",
+            "assigned_vehicle": "amb-2"
+        }
+    },
+    {
+        "id": 1774452885656,
+        "event_type": "incident_dispatched",
+        "timestamp": "2026-03-25T21:04:45.656975",
+        "delivery_status": "mocked",
+        "delivery_mode": "mock",
+        "status_code": null,
+        "reason": "webhook_not_configured",
+        "error": null,
+        "incident": {
+            "id": 28,
+            "status": "Dispatched",
+            "priority": "Critical",
+            "category": "Gas Leak",
+            "summary": "SOS! Toxic gas smell reported near residential area. at Colaba Causeway.",
+            "venue_name": "Unknown Venue",
+            "floor": "Unknown",
+            "room_or_zone": "Unknown",
+            "assigned_vehicle": "fire-1"
+        }
+    },
+    {
+        "id": 1774452885631,
+        "event_type": "incident_dispatched",
+        "timestamp": "2026-03-25T21:04:45.631380",
+        "delivery_status": "mocked",
+        "delivery_mode": "mock",
+        "status_code": null,
+        "reason": "webhook_not_configured",
+        "error": null,
+        "incident": {
+            "id": 40,
+            "status": "Dispatched",
+            "priority": "Critical",
+            "category": "Gas Leak",
+            "summary": "SOS! Toxic gas smell reported near residential area. at R City Mall.",
+            "venue_name": "Unknown Venue",
+            "floor": "Unknown",
+            "room_or_zone": "Unknown",
+            "assigned_vehicle": "fire-1"
+        }
+    },
+    {
+        "id": 1774452885561,
+        "event_type": "incident_dispatched",
+        "timestamp": "2026-03-25T21:04:45.561254",
+        "delivery_status": "mocked",
+        "delivery_mode": "mock",
+        "status_code": null,
+        "reason": "webhook_not_configured",
+        "error": null,
+        "incident": {
+            "id": 48,
+            "status": "Dispatched",
+            "priority": "High",
+            "category": "Accident",
+            "summary": "SOS! Car collision with multiple injuries reported. at Marine Drive.",
+            "venue_name": "Unknown Venue",
+            "floor": "Unknown",
+            "room_or_zone": "Unknown",
+            "assigned_vehicle": "amb-2"
+        }
+    },
+    {
+        "id": 1774452885557,
+        "event_type": "incident_dispatched",
+        "timestamp": "2026-03-25T21:04:45.557074",
+        "delivery_status": "mocked",
+        "delivery_mode": "mock",
+        "status_code": null,
+        "reason": "webhook_not_configured",
+        "error": null,
+        "incident": {
+            "id": 14,
+            "status": "Dispatched",
+            "priority": "Critical",
+            "category": "Medical Emergency",
+            "summary": "SOS! Severe cardiac arrest patient collapsed on road. at Girgaon Chowpatty.",
+            "venue_name": "Unknown Venue",
+            "floor": "Unknown",
+            "room_or_zone": "Unknown",
+            "assigned_vehicle": "amb-2"
+        }
+    }
+]

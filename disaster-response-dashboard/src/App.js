@@ -105,6 +105,18 @@ function formatDuration(minutes) {
   return `${hours}h ${mins}m`;
 }
 
+function formatBridgeEventLabel(eventType) {
+  return String(eventType || 'bridge_event')
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
+function formatIncidentSource(source) {
+  if (source === 'panic_button') return 'Panic Button';
+  if (source === 'manual_report') return 'Manual Report';
+  return 'External Feed';
+}
+
 function getTimelineStatusTime(incident, status) {
   const timeline = Array.isArray(incident?.status_timeline) ? incident.status_timeline : [];
   const entry = timeline.find((item) => item.status === status);
@@ -164,8 +176,10 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [showTraffic, setShowTraffic] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
+  const [panicSubmitting, setPanicSubmitting] = useState(false);
   const [situation, setSituation] = useState({ temp: "--", cond: "Loading...", insight: "Connecting to AI satellite..." });
   const [bridgeMode, setBridgeMode] = useState({ mode: 'unknown', webhook_configured: false });
+  const [bridgeEvents, setBridgeEvents] = useState([]);
   const [kpis, setKpis] = useState({
     avgAcknowledgeMins: null,
     avgDispatchMins: null,
@@ -263,18 +277,34 @@ function App() {
       }
     };
 
+    const fetchBridgeEvents = async () => {
+      try {
+        const res = await fetch('http://127.0.0.1:5001/bridge_events?limit=8');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (Array.isArray(data)) {
+          setBridgeEvents(data);
+        }
+      } catch (err) {
+        console.error('Error fetching bridge events:', err);
+      }
+    };
+
     fetchSituation();
     fetchSos();
     fetchBridgeStatus();
+    fetchBridgeEvents();
 
     const sosInterval = setInterval(fetchSos, 5000);
     const situationInterval = setInterval(fetchSituation, 60000);
     const bridgeStatusInterval = setInterval(fetchBridgeStatus, 60000);
+    const bridgeEventsInterval = setInterval(fetchBridgeEvents, 7000);
 
     return () => {
       clearInterval(sosInterval);
       clearInterval(situationInterval);
       clearInterval(bridgeStatusInterval);
+      clearInterval(bridgeEventsInterval);
     };
   }, []);
 
@@ -499,6 +529,66 @@ function App() {
     }
   };
 
+  const handlePanicAlert = async () => {
+    if (!navigator.geolocation) {
+      alert('Geolocation is not supported by this browser.');
+      return;
+    }
+
+    setPanicSubmitting(true);
+
+    try {
+      const position = await new Promise((resolve, reject) => {
+        navigator.geolocation.getCurrentPosition(resolve, reject, {
+          enableHighAccuracy: true,
+          timeout: 10000,
+        });
+      });
+
+      const payload = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude,
+        venue_name: 'Hospitality Venue',
+        floor: 'Unknown',
+        room_or_zone: 'Panic Trigger Zone',
+        reporter_type: 'Staff',
+        affected_people_count: 1,
+        panic_code: 'PANIC-01',
+        description: 'Silent panic button triggered. Dispatch nearest responders immediately.'
+      };
+
+      const res = await fetch('http://127.0.0.1:5001/panic_alert', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) {
+        let errorMessage = 'Failed to trigger panic alert.';
+        try {
+          const errPayload = await res.json();
+          if (errPayload?.error) {
+            errorMessage = errPayload.error;
+          }
+        } catch (_) {
+          // Keep default message.
+        }
+        throw new Error(errorMessage);
+      }
+
+      const responsePayload = await res.json();
+      if (responsePayload?.incident) {
+        setSosData(prev => [responsePayload.incident, ...prev]);
+        setSelectedIncident(responsePayload.incident);
+      }
+    } catch (err) {
+      console.error('Panic alert failed:', err);
+      alert(err.message || 'Failed to trigger panic alert.');
+    } finally {
+      setPanicSubmitting(false);
+    }
+  };
+
   const mumbaiCenter = { lat: 19.0760, lng: 72.8777 };
 
   useEffect(() => {
@@ -559,6 +649,10 @@ function App() {
               <AlertTriangle size={18} />
               REPORT INCIDENT
             </button>
+            <button className="panic-btn-header" onClick={handlePanicAlert} disabled={panicSubmitting}>
+              <AlertCircle size={18} />
+              {panicSubmitting ? 'TRIGGERING...' : 'PANIC BUTTON'}
+            </button>
             <FleetDropdown resources={resources} onSelect={(res) => { setSelectedVehicle(res); setSelectedIncident(null); }} />
           </div>
         </header>
@@ -597,6 +691,35 @@ function App() {
               </div>
             </div>
 
+            <div className="bridge-log-card">
+              <div className="bridge-log-header">
+                <h3>Bridge Activity</h3>
+                <span className={`bridge-log-mode ${bridgeMode.mode === 'live' ? 'live' : 'mock'}`}>
+                  {bridgeMode.mode === 'live' ? 'Live Relay' : 'Mock Relay'}
+                </span>
+              </div>
+              <div className="bridge-log-list">
+                {bridgeEvents.length === 0 ? (
+                  <p className="bridge-log-empty">No bridge events yet. Critical incidents and lifecycle updates will appear here.</p>
+                ) : bridgeEvents.map((event) => (
+                  <div key={event.id} className="bridge-log-item">
+                    <div className="bridge-log-row">
+                      <span className="bridge-log-title">{formatBridgeEventLabel(event.event_type)}</span>
+                      <span className={`bridge-log-status ${event.delivery_status}`}>{event.delivery_status}</span>
+                    </div>
+                    <p className="bridge-log-summary">
+                      #{event.incident?.id} {event.incident?.category || 'Incident'} at {event.incident?.venue_name || 'Unknown Venue'}
+                    </p>
+                    <div className="bridge-log-meta">
+                      <span>{new Date(event.timestamp).toLocaleTimeString()}</span>
+                      <span>{event.incident?.status || 'Unknown status'}</span>
+                      <span>{event.delivery_mode === 'webhook' ? 'Webhook' : 'Mock'}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
             <h2>Live SOS Feed</h2>
             <div className="sos-feed">
               {loading ? <p>Loading data...</p> : sosData.map(item => (
@@ -615,6 +738,10 @@ function App() {
                   <p className="helper-text">
                     {item.venue_name || 'Unknown Venue'} | {item.floor || 'Unknown'} | {item.room_or_zone || 'Unknown'}
                   </p>
+                  <div className="incident-source-row">
+                    <span className={`incident-source ${item.source || 'external_feed'}`}>{formatIncidentSource(item.source)}</span>
+                    {item.panic_code && <span className="incident-source panic-code">{item.panic_code}</span>}
+                  </div>
                   <div className="sos-meta">
                     <span><MapPin size={12} /> {item.location_text || item.location}</span>
                     <div className="severity-bar">
