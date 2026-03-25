@@ -1,13 +1,12 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { APIProvider, Map as GoogleMap, AdvancedMarker, Pin, useMap } from '@vis.gl/react-google-maps';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { APIProvider, Map as GoogleMap, AdvancedMarker, useMap } from '@vis.gl/react-google-maps';
 import { decode } from '@googlemaps/polyline-codec';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertCircle, MapPin, Navigation, Activity, Shield, Flame, Truck, AlertTriangle } from 'lucide-react';
+import { AlertCircle, MapPin, Activity, Shield, Flame, Truck, AlertTriangle } from 'lucide-react';
 import ReportModal from './ReportModal';
 import VehicleDetailPanel from './VehicleDetailPanel';
 import IncidentDetailPanel from './IncidentDetailPanel';
 import FleetDropdown from './FleetDropdown';
-import { findPath } from './MumbaiNavigationGraph';
 import IntroOverlay from './IntroOverlay';
 import './App.css';
 
@@ -162,13 +161,9 @@ function App() {
   const [sosData, setSosData] = useState([]);
   const [selectedIncident, setSelectedIncident] = useState(null);
   const [selectedVehicle, setSelectedVehicle] = useState(null);
-  const [routeInfo, setRouteInfo] = useState(null);
-  const [decodedPath, setDecodedPath] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [nearbyPlaces, setNearbyPlaces] = useState({ hospitals: [], police_stations: [], fire_stations: [] });
   const [showTraffic, setShowTraffic] = useState(false);
   const [showReportModal, setShowReportModal] = useState(false);
-  const [error, setError] = useState(null);
   const [situation, setSituation] = useState({ temp: "--", cond: "Loading...", insight: "Connecting to AI satellite..." });
   const [bridgeMode, setBridgeMode] = useState({ mode: 'unknown', webhook_configured: false });
   const [kpis, setKpis] = useState({
@@ -261,11 +256,9 @@ function App() {
           return [...synced, ...localOnly];
         });
 
-        setError(null);
         setLoading(false);
       } catch (err) {
         console.error("Error fetching SOS data:", err);
-        setError("Could not load disaster data. Is the backend running?");
         setLoading(false);
       }
     };
@@ -286,7 +279,7 @@ function App() {
   }, []);
 
   // Helper: Fetch Route in Background
-  const fetchRouteForVehicle = async (vehicle, target) => {
+  const fetchRouteForVehicle = useCallback(async (vehicle, target) => {
     try {
       const res = await fetch(`http://127.0.0.1:5001/get_route?lat=${target.coordinates.lat}&lng=${target.coordinates.lng}&start_lat=${vehicle.lat}&start_lng=${vehicle.lng}`);
       if (res.ok) {
@@ -314,9 +307,9 @@ function App() {
         return r;
       }));
     }
-  };
+  }, []);
 
-  const updateIncidentStatus = async (incidentId, status, options = {}) => {
+  const updateIncidentStatus = useCallback(async (incidentId, status, options = {}) => {
     const payload = {
       incident_id: incidentId,
       status,
@@ -352,9 +345,9 @@ function App() {
       setSosData(prev => prev.map(inc => inc.id === responsePayload.incident.id ? responsePayload.incident : inc));
       setSelectedIncident(prev => prev && prev.id === responsePayload.incident.id ? responsePayload.incident : prev);
     }
-  };
+  }, []);
 
-  const assignVehicle = async (vehicleId, incidentId) => {
+  const assignVehicle = useCallback(async (vehicleId, incidentId) => {
     const vehicle = resources.find(r => r.id === vehicleId);
     if (!vehicle) return;
 
@@ -406,7 +399,7 @@ function App() {
         console.error('Failed to persist recall status:', err);
       }
     }
-  };
+  }, [fetchRouteForVehicle, resources, sosData, updateIncidentStatus]);
 
   const handleIncidentStatusChange = async (incidentId, status) => {
     try {
@@ -445,7 +438,7 @@ function App() {
         }
       }
     });
-  }, [sosData]);
+  }, [assignVehicle, resources, sosData]);
 
   // SIMULATE MOVEMENT (Following Path)
   useEffect(() => {
@@ -534,7 +527,7 @@ function App() {
         console.error('Failed to persist On Scene update:', err);
       });
     });
-  }, [resources]);
+  }, [resources, updateIncidentStatus]);
 
   return (
     <APIProvider apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}>
@@ -681,7 +674,7 @@ function App() {
                 res.status === 'DISPATCHED' && res.path && (
                   <RoutePolyline
                     key={res.id}
-                    path={res.path.map(p => [p.lat, p.lng])}
+                    path={res.path}
                   />
                 )
               ))}
