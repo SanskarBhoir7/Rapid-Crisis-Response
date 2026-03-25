@@ -1,5 +1,6 @@
 import json
 import os
+import time
 import requests
 from datetime import datetime
 from flask import Flask, jsonify, request
@@ -16,6 +17,7 @@ CORS(app)
 PROCESSED_DATA_FILE = "processed_data.json"
 RESCUE_HQ_COORDS = "18.9486,72.8336"
 GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
+EMERGENCY_WEBHOOK_URL = os.getenv("EMERGENCY_WEBHOOK_URL")
 
 if not GOOGLE_MAPS_API_KEY:
     print("Warning: GOOGLE_MAPS_API_KEY not found in environment. Checking .env file...")
@@ -26,6 +28,133 @@ if not GOOGLE_MAPS_API_KEY:
         print(".env file NOT found.")
     raise ValueError("Error: GOOGLE_MAPS_API_KEY environment variable is not set.")
 
+
+def _priority_from_severity(severity_score):
+    if severity_score >= 8:
+        return "Critical"
+    if severity_score >= 6:
+        return "High"
+    return "Moderate"
+
+
+def _normalize_incident(incident):
+    """Backfill required fields so mixed legacy/new data remains UI-compatible."""
+    severity_score = int(incident.get("severity_score", 5))
+    priority = incident.get("priority") or _priority_from_severity(severity_score)
+    timestamp = incident.get("timestamp") or datetime.now().isoformat()
+    status = incident.get("status") or "Created"
+    status_timeline = incident.get("status_timeline") or [
+        {
+            "status": "Created",
+            "timestamp": timestamp,
+            "actor": "system",
+            "note": "Incident registered"
+        }
+    ]
+
+    incident["severity_score"] = severity_score
+    incident["priority"] = priority
+    incident["status"] = status
+    incident["timestamp"] = timestamp
+    incident["status_timeline"] = status_timeline
+    incident["venue_name"] = incident.get("venue_name") or "Unknown Venue"
+    incident["floor"] = incident.get("floor") or "Unknown"
+    incident["room_or_zone"] = incident.get("room_or_zone") or "Unknown"
+    incident["reporter_type"] = incident.get("reporter_type") or "Guest"
+    try:
+        incident["affected_people_count"] = int(incident.get("affected_people_count", 1))
+    except (ValueError, TypeError):
+        incident["affected_people_count"] = 1
+
+    return incident
+
+
+def _classify_incident_from_description(description):
+    desc_lower = description.lower()
+
+    category = "General Emergency"
+    urgency = "Urgent"
+    severity = 6
+    need_type = ["Police"]
+
+    if "fire" in desc_lower or "explosion" in desc_lower or "smoke" in desc_lower:
+        category = "Fire"
+        urgency = "Life-threatening"
+        severity = 9
+        need_type = ["Fire", "Rescue"]
+    elif "flood" in desc_lower or "drowning" in desc_lower or "water" in desc_lower:
+        category = "Flooding"
+        urgency = "Life-threatening"
+        severity = 8
+        need_type = ["Rescue", "Police"]
+    elif "medical" in desc_lower or "blood" in desc_lower or "heart" in desc_lower or "injury" in desc_lower:
+        category = "Medical Emergency"
+        urgency = "Life-threatening"
+        severity = 9
+        need_type = ["Medical"]
+    elif "collapse" in desc_lower or "trapped" in desc_lower:
+        category = "Structure Collapse"
+        urgency = "Life-threatening"
+        severity = 10
+        need_type = ["Fire", "Medical", "Police"]
+
+    return {
+        "category": category,
+        "urgency": urgency,
+        "severity": severity,
+        "need_type": need_type,
+    }
+
+
+def _load_incidents():
+    if not os.path.exists(PROCESSED_DATA_FILE):
+        return []
+    with open(PROCESSED_DATA_FILE, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+
+def _save_incidents(incidents):
+    with open(PROCESSED_DATA_FILE, 'w', encoding='utf-8') as f:
+        json.dump(incidents, f, indent=4)
+
+
+def _send_emergency_bridge_event(event_type, incident):
+    """
+    Sends a structured event to an external webhook for emergency bridge integration.
+    If EMERGENCY_WEBHOOK_URL is not configured, this becomes a no-op mock success.
+    """
+    payload = {
+        "event_type": event_type,
+        "timestamp": datetime.now().isoformat(),
+        "incident": {
+            "id": incident.get("id"),
+            "status": incident.get("status"),
+            "priority": incident.get("priority"),
+            "category": incident.get("category"),
+            "summary": incident.get("summary") or incident.get("original_message"),
+            "urgency": incident.get("urgency"),
+            "coordinates": incident.get("coordinates"),
+            "venue_name": incident.get("venue_name"),
+            "floor": incident.get("floor"),
+            "room_or_zone": incident.get("room_or_zone"),
+            "reporter_type": incident.get("reporter_type"),
+            "affected_people_count": incident.get("affected_people_count"),
+            "assigned_vehicle": incident.get("assigned_vehicle")
+        }
+    }
+
+    if not EMERGENCY_WEBHOOK_URL:
+        print(f"[Bridge] EMERGENCY_WEBHOOK_URL not configured. Mock sent: {event_type} for incident {incident.get('id')}")
+        return {"delivered": False, "mode": "mock", "reason": "webhook_not_configured"}
+
+    try:
+        response = requests.post(EMERGENCY_WEBHOOK_URL, json=payload, timeout=8)
+        response.raise_for_status()
+        return {"delivered": True, "mode": "webhook", "status_code": response.status_code}
+    except requests.exceptions.RequestException as e:
+        print(f"[Bridge] Failed to send webhook event: {e}")
+        return {"delivered": False, "mode": "webhook", "error": str(e)}
+
 # --- API Endpoints ---
 @app.route('/get_sos_data', methods=['GET'])
 def get_sos_data():
@@ -34,8 +163,9 @@ def get_sos_data():
     try:
         with open(PROCESSED_DATA_FILE, 'r', encoding='utf-8') as f:
             all_data = json.load(f)
+        normalized_data = [_normalize_incident(item) for item in all_data]
         filtered_data = [
-            item for item in all_data 
+            item for item in normalized_data
             if item.get("coordinates") and item.get("authenticity_score", 0) >= 4
         ]
         sorted_data = sorted(filtered_data, key=lambda x: x['severity_score'], reverse=True)
@@ -54,6 +184,15 @@ def get_situation_update():
         return jsonify(report)
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@app.route('/bridge_status', methods=['GET'])
+def bridge_status():
+    mode = "live" if EMERGENCY_WEBHOOK_URL else "mock"
+    return jsonify({
+        "mode": mode,
+        "webhook_configured": bool(EMERGENCY_WEBHOOK_URL)
+    })
 
 @app.route('/get_route', methods=['GET'])
 def get_route():
@@ -147,64 +286,82 @@ def report_incident():
     if not data or 'description' not in data or 'lat' not in data or 'lng' not in data:
         return jsonify({"error": "Missing required fields (description, lat, lng)"}), 400
 
-    # 2. Simulate AI Analysis (or use real AI if key exists)
-    # In a real scenario, we would send 'data['description']' to Gemini here.
-    # For now, we will auto-generate some fields based on the description to keep it fast/responsive.
-    
-    description = data['description']
-    
-    # Simple keyword based classification for the demo
-    urgency = "Urgent"
-    severity = 5
-    need = "General Assistance"
-    
-    desc_lower = description.lower()
-    if "fire" in desc_lower or "explosion" in desc_lower:
-        urgency = "Life-threatening"
-        severity = 9
-        need = "Firefighters"
-    elif "flood" in desc_lower or "drowning" in desc_lower:
-        urgency = "Life-threatening"
-        severity = 8
-        need = "Rescue Boat"
-    elif "medical" in desc_lower or "blood" in desc_lower or "heart" in desc_lower:
-        urgency = "Life-threatening"
-        severity = 9
-        need = "Medical Support"
+    description = str(data['description']).strip()
+    venue_name = str(data.get('venue_name') or "Unknown Venue").strip()
+    floor = str(data.get('floor') or "Unknown").strip()
+    room_or_zone = str(data.get('room_or_zone') or "Unknown").strip()
+    reporter_type = str(data.get('reporter_type') or "Guest").strip()
+    if reporter_type not in ["Guest", "Staff", "Security"]:
+        reporter_type = "Guest"
+
+    try:
+        affected_people_count = int(data.get('affected_people_count', 1))
+    except (ValueError, TypeError):
+        affected_people_count = 1
+    if affected_people_count < 1:
+        affected_people_count = 1
+
+    try:
+        lat = float(data['lat'])
+        lng = float(data['lng'])
+    except (ValueError, TypeError):
+        return jsonify({"error": "Latitude and longitude must be valid numbers."}), 400
+
+    classified = _classify_incident_from_description(description)
+    generated_id = int(time.time() * 1000)
+    timestamp = datetime.now().isoformat()
+    priority = _priority_from_severity(classified["severity"])
     
     new_incident = {
-        "id": int(str(int(data['lat'] * 1000)) + str(int(data['lng'] * 1000))), # Fake ID generation
+        "id": generated_id,
         "original_message": description,
-        "location_text": "User Reported Location",
-        "urgency": urgency,
-        "need_type": need,
+        "category": classified["category"],
+        "priority": priority,
+        "urgency": classified["urgency"],
+        "need_type": classified["need_type"],
         "summary": description,
-        "severity_score": severity,
+        "severity_score": classified["severity"],
         "coordinates": {
-            "lat": float(data['lat']),
-            "lng": float(data['lng'])
+            "lat": lat,
+            "lng": lng
         },
+        "location": "User Reported Location",
+        "location_text": "User Reported Location",
+        "venue_name": venue_name,
+        "floor": floor,
+        "room_or_zone": room_or_zone,
+        "reporter_type": reporter_type,
+        "affected_people_count": affected_people_count,
         "authenticity_score": 10, # User reported is generally high for demo
         "reasoning": "Direct verified report from user on ground.",
         "flags": [],
-        "timestamp": datetime.now().isoformat()
+        "status": "Created",
+        "status_timeline": [
+            {
+                "status": "Created",
+                "timestamp": timestamp,
+                "actor": "reporter",
+                "note": "Incident submitted from report form"
+            }
+        ],
+        "timestamp": timestamp
     }
 
     # 3. Add to our in-memory data (so it shows up in /get_sos_data calls)
     try:
         # Load existing
-        if os.path.exists(PROCESSED_DATA_FILE):
-             with open(PROCESSED_DATA_FILE, 'r', encoding='utf-8') as f:
-                current_data = json.load(f)
-        else:
-            current_data = []
+        current_data = _load_incidents()
 
         # Prepend new incident
-        current_data.insert(0, new_incident)
+        normalized_incident = _normalize_incident(new_incident)
+        current_data.insert(0, normalized_incident)
+
+        # Bridge trigger for high-priority incidents.
+        if normalized_incident.get("severity_score", 0) >= 8:
+            _send_emergency_bridge_event("incident_created_critical", normalized_incident)
 
         # Save back
-        with open(PROCESSED_DATA_FILE, 'w', encoding='utf-8') as f:
-            json.dump(current_data, f, indent=4)
+        _save_incidents(current_data)
             
         print("Incident saved successfully.")
         return jsonify({"message": "Incident reported successfully", "incident": new_incident})
@@ -212,6 +369,80 @@ def report_incident():
     except Exception as e:
         print(f"Error saving incident: {e}")
         return jsonify({"error": "Internal Server Error"}), 500
+
+
+@app.route('/update_incident_status', methods=['POST'])
+def update_incident_status():
+    data = request.json or {}
+
+    incident_id = data.get('incident_id')
+    status = str(data.get('status') or '').strip()
+    actor = str(data.get('actor') or 'operator').strip()
+    note = str(data.get('note') or '').strip()
+    assigned_vehicle = data.get('assigned_vehicle')
+
+    valid_statuses = ["Created", "Acknowledged", "Dispatched", "En Route", "On Scene", "Resolved"]
+    allowed_transitions = {
+        "Created": ["Acknowledged", "Dispatched"],
+        "Acknowledged": ["Dispatched", "Resolved"],
+        "Dispatched": ["En Route", "On Scene", "Resolved"],
+        "En Route": ["On Scene", "Resolved"],
+        "On Scene": ["Resolved"],
+        "Resolved": []
+    }
+
+    if incident_id is None or not status:
+        return jsonify({"error": "Missing required fields (incident_id, status)."}), 400
+
+    if status not in valid_statuses:
+        return jsonify({"error": f"Invalid status. Valid values: {', '.join(valid_statuses)}"}), 400
+
+    try:
+        incidents = _load_incidents()
+    except Exception as e:
+        return jsonify({"error": f"Failed to load incidents: {e}"}), 500
+
+    incident_index = None
+    for idx, item in enumerate(incidents):
+        if str(item.get('id')) == str(incident_id):
+            incident_index = idx
+            break
+
+    if incident_index is None:
+        return jsonify({"error": "Incident not found."}), 404
+
+    incident = _normalize_incident(incidents[incident_index])
+    current_status = incident.get('status', 'Created')
+
+    if status != current_status:
+        next_allowed = allowed_transitions.get(current_status, [])
+        if status not in next_allowed:
+            return jsonify({
+                "error": f"Invalid transition from {current_status} to {status}. Allowed: {', '.join(next_allowed) if next_allowed else 'none'}"
+            }), 400
+
+    incident['status'] = status
+    if assigned_vehicle is not None:
+        incident['assigned_vehicle'] = assigned_vehicle
+
+    incident['status_timeline'].append({
+        "status": status,
+        "timestamp": datetime.now().isoformat(),
+        "actor": actor,
+        "note": note or f"Status updated to {status}"
+    })
+
+    if status in ["Dispatched", "On Scene", "Resolved"]:
+        _send_emergency_bridge_event(f"incident_{status.lower().replace(' ', '_')}", incident)
+
+    incidents[incident_index] = incident
+
+    try:
+        _save_incidents(incidents)
+    except Exception as e:
+        return jsonify({"error": f"Failed to save incident update: {e}"}), 500
+
+    return jsonify({"message": "Incident status updated", "incident": incident})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)

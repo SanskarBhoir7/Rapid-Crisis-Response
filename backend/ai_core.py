@@ -9,6 +9,7 @@ load_dotenv()
 # --- CONFIGURATION ---
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-1.5-flash")
 
 # Check if keys are loaded
 if not GEMINI_API_KEY:
@@ -18,8 +19,73 @@ if not GOOGLE_MAPS_API_KEY:
 
 genai.configure(api_key=GEMINI_API_KEY)
 
-# Use the latest, most compatible model. This is the key change.
-gemini_model = genai.GenerativeModel('gemini-1.5-flash-latest')
+def _build_model_candidates():
+    """Build preferred model list; user-provided model is always tried first."""
+    defaults = [
+        "gemini-2.0-flash",
+        "gemini-2.0-flash-lite",
+        "gemini-1.5-flash",
+        "gemini-1.5-pro",
+    ]
+    return [GEMINI_MODEL] + [m for m in defaults if m != GEMINI_MODEL]
+
+
+def _supports_generate_content(model_info):
+    methods = getattr(model_info, "supported_generation_methods", []) or []
+    return "generateContent" in methods
+
+
+def _resolve_gemini_model():
+    """
+    Resolve a working model for this API key.
+    Falls back gracefully if model listing is unavailable.
+    """
+    candidates = _build_model_candidates()
+    try:
+        models = list(genai.list_models())
+        available = {}
+        for model in models:
+            model_name = getattr(model, "name", "")
+            if not model_name:
+                continue
+            short_name = model_name.split("models/")[-1]
+            available[model_name] = model
+            available[short_name] = model
+
+        for candidate in candidates:
+            model_info = available.get(candidate)
+            if model_info and _supports_generate_content(model_info):
+                selected_name = getattr(model_info, "name", candidate).split("models/")[-1]
+                print(f"Gemini model selected: {selected_name}")
+                return genai.GenerativeModel(selected_name)
+    except Exception as e:
+        print(f"Warning: Could not list Gemini models, falling back to configured model '{GEMINI_MODEL}'. Reason: {e}")
+
+    # Last attempt: try configured model directly.
+    try:
+        print(f"Gemini model fallback: {GEMINI_MODEL}")
+        return genai.GenerativeModel(GEMINI_MODEL)
+    except Exception as e:
+        print(f"Warning: Could not initialize Gemini model '{GEMINI_MODEL}'. Reason: {e}")
+        return None
+
+
+gemini_model = _resolve_gemini_model()
+
+
+def _generate_with_gemini(prompt: str):
+    """Single wrapper so repeated model errors don't spam every request forever."""
+    global gemini_model
+    if not gemini_model:
+        return None
+    try:
+        return gemini_model.generate_content(prompt)
+    except Exception as e:
+        print(f"Gemini request failed: {e}")
+        # Disable after hard model-not-found style failures to reduce noisy logs.
+        if "not found" in str(e).lower() or "404" in str(e):
+            gemini_model = None
+        return None
 
 
 # --- FUNCTION 1: GEMINI ANALYSIS (NEW ENHANCED VERSION) ---
@@ -51,7 +117,9 @@ def analyze_sos_with_gemini(message: str) -> dict:
     **JSON Output:**
     """
     try:
-        response = gemini_model.generate_content(prompt)
+        response = _generate_with_gemini(prompt)
+        if not response:
+            return None
         # Clean up the response to ensure it's valid JSON
         json_text = response.text.strip().replace("```json", "").replace("```", "")
         return json.loads(json_text)
@@ -161,7 +229,9 @@ def generate_situation_report() -> dict:
     """
     
     try:
-        response = gemini_model.generate_content(prompt)
+        response = _generate_with_gemini(prompt)
+        if not response:
+            raise ValueError("No Gemini response available")
         json_text = response.text.strip().replace("```json", "").replace("```", "")
         return json.loads(json_text)
     except Exception as e:

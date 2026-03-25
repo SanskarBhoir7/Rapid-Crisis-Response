@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { APIProvider, Map, AdvancedMarker, Pin, useMap } from '@vis.gl/react-google-maps';
+import { APIProvider, Map as GoogleMap, AdvancedMarker, Pin, useMap } from '@vis.gl/react-google-maps';
 import { decode } from '@googlemaps/polyline-codec';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertCircle, MapPin, Navigation, Activity, Shield, Flame, Truck, AlertTriangle } from 'lucide-react';
@@ -92,6 +92,70 @@ function DigitalClock() {
   );
 }
 
+function toMs(value) {
+  const date = new Date(value);
+  const ms = date.getTime();
+  return Number.isFinite(ms) ? ms : null;
+}
+
+function formatDuration(minutes) {
+  if (!Number.isFinite(minutes) || minutes < 0) return '--';
+  if (minutes < 60) return `${Math.round(minutes)}m`;
+  const hours = Math.floor(minutes / 60);
+  const mins = Math.round(minutes % 60);
+  return `${hours}h ${mins}m`;
+}
+
+function getTimelineStatusTime(incident, status) {
+  const timeline = Array.isArray(incident?.status_timeline) ? incident.status_timeline : [];
+  const entry = timeline.find((item) => item.status === status);
+  return entry ? toMs(entry.timestamp) : null;
+}
+
+function calculateResponseKpis(incidents) {
+  const now = Date.now();
+  const acknowledgeMins = [];
+  const dispatchMins = [];
+  const resolveMins = [];
+  let unresolvedCritical = 0;
+
+  incidents.forEach((incident) => {
+    const createdMs = getTimelineStatusTime(incident, 'Created') || toMs(incident.timestamp);
+    if (!createdMs) return;
+
+    const acknowledgedMs = getTimelineStatusTime(incident, 'Acknowledged');
+    const dispatchedMs = getTimelineStatusTime(incident, 'Dispatched');
+    const resolvedMs = getTimelineStatusTime(incident, 'Resolved');
+
+    if (acknowledgedMs && acknowledgedMs >= createdMs) {
+      acknowledgeMins.push((acknowledgedMs - createdMs) / 60000);
+    }
+
+    if (dispatchedMs && dispatchedMs >= createdMs) {
+      dispatchMins.push((dispatchedMs - createdMs) / 60000);
+    }
+
+    if (resolvedMs && resolvedMs >= createdMs) {
+      resolveMins.push((resolvedMs - createdMs) / 60000);
+    }
+
+    const isCritical = (incident.severity_score || 0) >= 8;
+    const isResolved = incident.status === 'Resolved' || Boolean(resolvedMs);
+    if (isCritical && !isResolved && (now - createdMs) > 5 * 60000) {
+      unresolvedCritical += 1;
+    }
+  });
+
+  const average = (arr) => arr.length ? arr.reduce((sum, value) => sum + value, 0) / arr.length : null;
+
+  return {
+    avgAcknowledgeMins: average(acknowledgeMins),
+    avgDispatchMins: average(dispatchMins),
+    avgResolveMins: average(resolveMins),
+    unresolvedCritical
+  };
+}
+
 // --- MAIN APP COMPONENT ---
 function App() {
   const [showIntro, setShowIntro] = useState(false); // Disabled by user request
@@ -106,6 +170,13 @@ function App() {
   const [showReportModal, setShowReportModal] = useState(false);
   const [error, setError] = useState(null);
   const [situation, setSituation] = useState({ temp: "--", cond: "Loading...", insight: "Connecting to AI satellite..." });
+  const [bridgeMode, setBridgeMode] = useState({ mode: 'unknown', webhook_configured: false });
+  const [kpis, setKpis] = useState({
+    avgAcknowledgeMins: null,
+    avgDispatchMins: null,
+    avgResolveMins: null,
+    unresolvedCritical: 0
+  });
 
   // --- SMART DISPATCH SYSTEM ---
   const [resources, setResources] = useState([
@@ -132,10 +203,10 @@ function App() {
   };
 
   useEffect(() => {
-    // 1. Fetch Realtime AI Situation Report
-    fetch('http://127.0.0.1:5001/get_situation_update')
-      .then(res => res.json())
-      .then(data => {
+    const fetchSituation = async () => {
+      try {
+        const res = await fetch('http://127.0.0.1:5001/get_situation_update');
+        const data = await res.json();
         if (data.temperature) {
           setSituation({
             temp: data.temperature,
@@ -143,42 +214,75 @@ function App() {
             insight: data.insight
           });
         }
-      })
-      .catch(err => console.error("Error fetching situation report:", err));
+      } catch (err) {
+        console.error("Error fetching situation report:", err);
+      }
+    };
 
-    // 2. Fetch SOS Data
-    fetch('http://127.0.0.1:5001/get_sos_data')
-      .then(res => {
-        if (!res.ok) throw new Error("Failed to connect to backend");
-        return res.json();
-      })
-      .then(data => {
+    const fetchBridgeStatus = async () => {
+      try {
+        const res = await fetch('http://127.0.0.1:5001/bridge_status');
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data?.mode) {
+          setBridgeMode({
+            mode: data.mode,
+            webhook_configured: Boolean(data.webhook_configured)
+          });
+        }
+      } catch (err) {
+        console.error('Error fetching bridge status:', err);
+      }
+    };
+
+    const fetchSos = async () => {
+      try {
+        const res = await fetch('http://127.0.0.1:5001/get_sos_data');
+        if (!res.ok) {
+          throw new Error("Failed to connect to backend");
+        }
+
+        const data = await res.json();
+        const sortedData = data.sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0));
+
+        setSosData(prev => {
+          const prevById = new Map(prev.map(item => [item.id, item]));
+          const synced = sortedData.map(item => {
+            const prevItem = prevById.get(item.id);
+            return {
+              ...prevItem,
+              ...item,
+              assigned_vehicle: prevItem?.assigned_vehicle || item.assigned_vehicle
+            };
+          });
+
+          const syncedIds = new Set(synced.map(item => item.id));
+          const localOnly = prev.filter(item => !syncedIds.has(item.id));
+          return [...synced, ...localOnly];
+        });
+
+        setError(null);
         setLoading(false);
-        const sortedData = data.sort((a, b) => new Date(a.timestamp || 0) - new Date(b.timestamp || 0));
-
-        let currentIndex = 0;
-        setSosData(sortedData.slice(0, 3));
-        currentIndex = 3;
-
-        const interval = setInterval(() => {
-          if (currentIndex < sortedData.length) {
-            const newItem = sortedData[currentIndex];
-            if (newItem) {
-              setSosData(prev => [newItem, ...prev]);
-            }
-            currentIndex++;
-          } else {
-            clearInterval(interval);
-          }
-        }, 3000);
-
-        return () => clearInterval(interval);
-      })
-      .catch(err => {
+      } catch (err) {
         console.error("Error fetching SOS data:", err);
         setError("Could not load disaster data. Is the backend running?");
         setLoading(false);
-      });
+      }
+    };
+
+    fetchSituation();
+    fetchSos();
+    fetchBridgeStatus();
+
+    const sosInterval = setInterval(fetchSos, 5000);
+    const situationInterval = setInterval(fetchSituation, 60000);
+    const bridgeStatusInterval = setInterval(fetchBridgeStatus, 60000);
+
+    return () => {
+      clearInterval(sosInterval);
+      clearInterval(situationInterval);
+      clearInterval(bridgeStatusInterval);
+    };
   }, []);
 
   // Helper: Fetch Route in Background
@@ -212,7 +316,45 @@ function App() {
     }
   };
 
-  const assignVehicle = (vehicleId, incidentId) => {
+  const updateIncidentStatus = async (incidentId, status, options = {}) => {
+    const payload = {
+      incident_id: incidentId,
+      status,
+      actor: options.actor || 'operator',
+      note: options.note || `Status changed to ${status}`
+    };
+
+    if (options.assigned_vehicle !== undefined) {
+      payload.assigned_vehicle = options.assigned_vehicle;
+    }
+
+    const res = await fetch('http://127.0.0.1:5001/update_incident_status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      let errorMessage = 'Failed to update incident status.';
+      try {
+        const errPayload = await res.json();
+        if (errPayload?.error) {
+          errorMessage = errPayload.error;
+        }
+      } catch (_) {
+        // Keep fallback error message.
+      }
+      throw new Error(errorMessage);
+    }
+
+    const responsePayload = await res.json();
+    if (responsePayload?.incident) {
+      setSosData(prev => prev.map(inc => inc.id === responsePayload.incident.id ? responsePayload.incident : inc));
+      setSelectedIncident(prev => prev && prev.id === responsePayload.incident.id ? responsePayload.incident : prev);
+    }
+  };
+
+  const assignVehicle = async (vehicleId, incidentId) => {
     const vehicle = resources.find(r => r.id === vehicleId);
     if (!vehicle) return;
 
@@ -233,16 +375,48 @@ function App() {
     if (incidentId) {
       setSosData(prev => prev.map(inc => {
         if (inc.id === incidentId) {
-          return { ...inc, assigned_vehicle: vehicleId };
+          return { ...inc, assigned_vehicle: vehicleId, status: 'Dispatched' };
         }
         return inc;
       }));
+
+      try {
+        await updateIncidentStatus(incidentId, 'Dispatched', {
+          actor: 'dispatcher',
+          note: `Unit ${vehicleId} dispatched`,
+          assigned_vehicle: vehicleId
+        });
+      } catch (err) {
+        console.error('Failed to persist dispatch status:', err);
+      }
 
       // 2. Trigger Route Fetch
       const target = sosData.find(i => i.id === incidentId);
       if (target && target.coordinates) {
         fetchRouteForVehicle(vehicle, target);
       }
+    } else if (vehicle.target_incident_id) {
+      try {
+        await updateIncidentStatus(vehicle.target_incident_id, 'Acknowledged', {
+          actor: 'dispatcher',
+          note: `Unit ${vehicleId} recalled`,
+          assigned_vehicle: null
+        });
+      } catch (err) {
+        console.error('Failed to persist recall status:', err);
+      }
+    }
+  };
+
+  const handleIncidentStatusChange = async (incidentId, status) => {
+    try {
+      await updateIncidentStatus(incidentId, status, {
+        actor: 'operator',
+        note: `Manually set to ${status}`
+      });
+    } catch (err) {
+      console.error(err);
+      alert(err.message || 'Failed to update incident status.');
     }
   };
 
@@ -290,7 +464,7 @@ function App() {
           if (dist < speed) {
             const nextIndex = res.pathIndex + 1;
             if (nextIndex >= res.path.length) {
-              return { ...res, status: 'BUSY', path: [] };
+              return { ...res, status: 'BUSY', path: [], justArrived: true };
             }
             return { ...res, lat: targetNode.lat, lng: targetNode.lng, pathIndex: nextIndex };
           } else {
@@ -305,25 +479,62 @@ function App() {
     return () => clearInterval(moveInterval);
   }, []);
 
-  const handleReportSubmit = (reportData) => {
-    const newIncident = {
-      id: sosData.length + 1,
-      category: reportData.category,
-      original_message: reportData.description,
-      priority: "High",
-      severity_score: 8, // Default high severity for manual reports
-      authenticity_score: 10,
-      timestamp: new Date().toISOString(),
-      location: "Manual Report",
-      status: "Open",
-      coordinates: { lat: 19.0760, lng: 72.8777 }, // Default center for now
-      need_type: [reportData.category]
-    };
-    setSosData(prev => [newIncident, ...prev]);
-    setShowReportModal(false);
+  const handleReportSubmit = async (reportData) => {
+    const res = await fetch('http://127.0.0.1:5001/report_incident', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(reportData)
+    });
+
+    if (!res.ok) {
+      let errorMessage = 'Failed to submit incident report.';
+      try {
+        const errPayload = await res.json();
+        if (errPayload?.error) {
+          errorMessage = errPayload.error;
+        }
+      } catch (_) {
+        // Keep default error message when response is non-JSON.
+      }
+      throw new Error(errorMessage);
+    }
+
+    const payload = await res.json();
+    if (payload?.incident) {
+      setSosData(prev => [payload.incident, ...prev]);
+      setSelectedIncident(payload.incident);
+    }
   };
 
   const mumbaiCenter = { lat: 19.0760, lng: 72.8777 };
+
+  useEffect(() => {
+    setKpis(calculateResponseKpis(sosData));
+  }, [sosData]);
+
+  useEffect(() => {
+    const arrivals = resources.filter(res => res.justArrived && res.target_incident_id);
+    if (arrivals.length === 0) {
+      return;
+    }
+
+    const arrivedResourceIds = new Set(arrivals.map(res => res.id));
+    setResources(prev => prev.map(res => {
+      if (!arrivedResourceIds.has(res.id)) {
+        return res;
+      }
+      return { ...res, justArrived: false };
+    }));
+
+    arrivals.forEach((res) => {
+      updateIncidentStatus(res.target_incident_id, 'On Scene', {
+        actor: 'system',
+        note: `${res.name} reached destination`
+      }).catch((err) => {
+        console.error('Failed to persist On Scene update:', err);
+      });
+    });
+  }, [resources]);
 
   return (
     <APIProvider apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}>
@@ -348,6 +559,9 @@ function App() {
           </div>
 
           <div className="header-actions">
+            <div className={`bridge-badge ${bridgeMode.mode === 'live' ? 'live' : 'mock'}`}>
+              BRIDGE: {bridgeMode.mode === 'live' ? 'LIVE' : bridgeMode.mode === 'mock' ? 'MOCK' : 'UNKNOWN'}
+            </div>
             <button className="report-btn-header" onClick={() => setShowReportModal(true)}>
               <AlertTriangle size={18} />
               REPORT INCIDENT
@@ -371,6 +585,25 @@ function App() {
               </div>
             </div>
 
+            <div className="kpi-strip">
+              <div className="kpi-item">
+                <span className="kpi-label">Avg Ack</span>
+                <span className="kpi-value">{formatDuration(kpis.avgAcknowledgeMins)}</span>
+              </div>
+              <div className="kpi-item">
+                <span className="kpi-label">Avg Dispatch</span>
+                <span className="kpi-value">{formatDuration(kpis.avgDispatchMins)}</span>
+              </div>
+              <div className="kpi-item">
+                <span className="kpi-label">Avg Resolve</span>
+                <span className="kpi-value">{formatDuration(kpis.avgResolveMins)}</span>
+              </div>
+              <div className="kpi-item alert">
+                <span className="kpi-label">Critical Open</span>
+                <span className="kpi-value">{kpis.unresolvedCritical}</span>
+              </div>
+            </div>
+
             <h2>Live SOS Feed</h2>
             <div className="sos-feed">
               {loading ? <p>Loading data...</p> : sosData.map(item => (
@@ -386,6 +619,9 @@ function App() {
                     <span className="time">{new Date(item.timestamp).toLocaleTimeString()}</span>
                   </div>
                   <p className="sos-msg">{item.original_message}</p>
+                  <p className="helper-text">
+                    {item.venue_name || 'Unknown Venue'} | {item.floor || 'Unknown'} | {item.room_or_zone || 'Unknown'}
+                  </p>
                   <div className="sos-meta">
                     <span><MapPin size={12} /> {item.location_text || item.location}</span>
                     <div className="severity-bar">
@@ -403,7 +639,7 @@ function App() {
 
           {/* MAP AREA */}
           <div className="map-wrapper">
-            <Map
+            <GoogleMap
               defaultCenter={mumbaiCenter}
               defaultZoom={12}
               mapId="4f65c879d6c34275"
@@ -449,7 +685,7 @@ function App() {
                   />
                 )
               ))}
-            </Map>
+            </GoogleMap>
           </div>
         </div>
 
@@ -469,6 +705,7 @@ function App() {
           incident={selectedIncident}
           onClose={() => setSelectedIncident(null)}
           onAssign={assignVehicle}
+          onStatusChange={handleIncidentStatusChange}
           vehicles={resources}
         />
       </div>

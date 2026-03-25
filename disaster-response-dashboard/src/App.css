@@ -141,6 +141,29 @@ body {
   gap: 1rem;
 }
 
+.bridge-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.7px;
+  padding: 0.4rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid var(--glass-border);
+  color: var(--text-primary);
+  background: rgba(148, 163, 184, 0.15);
+}
+
+.bridge-badge.live {
+  color: #86efac;
+  border-color: rgba(16, 185, 129, 0.55);
+  background: rgba(16, 185, 129, 0.2);
+}
+
+.bridge-badge.mock {
+  color: #fcd34d;
+  border-color: rgba(245, 158, 11, 0.55);
+  background: rgba(245, 158, 11, 0.2);
+}
+
 .report-btn-header {
   display: flex;
   align-items: center;
@@ -734,6 +757,67 @@ textarea:focus {
 .submit-btn:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+}
+
+.kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin: 0 1rem 0.75rem;
+}
+
+.kpi-item {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--glass-border);
+  border-radius: 10px;
+  padding: 0.55rem 0.65rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.kpi-item.alert {
+  border-color: rgba(239, 68, 68, 0.4);
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.kpi-label {
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+}
+
+.kpi-value {
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-top: 0.15rem;
+}
+
+input[type="text"],
+input[type="number"],
+select,
+textarea {
+  box-sizing: border-box;
+}
+
+input[type="text"],
+input[type="number"],
+select {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: 12px;
+  padding: 0.75rem 0.85rem;
+  color: var(--text-primary);
+  font-family: inherit;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+select:focus {
+  outline: none;
+  border-color: var(--accent-blue);
 }
 
 /* FAB BUTTON */

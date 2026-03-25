@@ -5,6 +5,11 @@ import './App.css';
 
 export default function ReportModal({ isOpen, onClose, onSubmit }) {
     const [description, setDescription] = useState("");
+    const [venueName, setVenueName] = useState("");
+    const [floor, setFloor] = useState("");
+    const [roomOrZone, setRoomOrZone] = useState("");
+    const [reporterType, setReporterType] = useState("Guest");
+    const [affectedPeopleCount, setAffectedPeopleCount] = useState(1);
     const [location, setLocation] = useState(null);
     const [loadingLocation, setLoadingLocation] = useState(false);
     const [submitting, setSubmitting] = useState(false);
@@ -40,11 +45,29 @@ export default function ReportModal({ isOpen, onClose, onSubmit }) {
         }
 
         setSubmitting(true);
-        await onSubmit({ description, ...location });
-        setSubmitting(false);
-        setDescription("");
-        setLocation(null);
-        onClose();
+        try {
+            await onSubmit({
+                description,
+                venue_name: venueName,
+                floor,
+                room_or_zone: roomOrZone,
+                reporter_type: reporterType,
+                affected_people_count: affectedPeopleCount,
+                ...location
+            });
+            setDescription("");
+            setVenueName("");
+            setFloor("");
+            setRoomOrZone("");
+            setReporterType("Guest");
+            setAffectedPeopleCount(1);
+            setLocation(null);
+            onClose();
+        } catch (error) {
+            alert(error.message || "Failed to submit the report. Please try again.");
+        } finally {
+            setSubmitting(false);
+        }
     };
 
     return (
@@ -70,6 +93,55 @@ export default function ReportModal({ isOpen, onClose, onSubmit }) {
                                     onChange={(e) => setDescription(e.target.value)}
                                     placeholder="Describe the emergency (e.g., 'Fire at station', 'Flooding on main road')..."
                                     rows={4}
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label>Venue Name</label>
+                                <input
+                                    type="text"
+                                    value={venueName}
+                                    onChange={(e) => setVenueName(e.target.value)}
+                                    placeholder="e.g., Hotel Sea Crest"
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label>Floor</label>
+                                <input
+                                    type="text"
+                                    value={floor}
+                                    onChange={(e) => setFloor(e.target.value)}
+                                    placeholder="e.g., 3rd Floor"
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label>Room / Zone</label>
+                                <input
+                                    type="text"
+                                    value={roomOrZone}
+                                    onChange={(e) => setRoomOrZone(e.target.value)}
+                                    placeholder="e.g., Room 312 / Lobby"
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label>Reporter Type</label>
+                                <select value={reporterType} onChange={(e) => setReporterType(e.target.value)}>
+                                    <option value="Guest">Guest</option>
+                                    <option value="Staff">Staff</option>
+                                    <option value="Security">Security</option>
+                                </select>
+                            </div>
+
+                            <div className="form-group">
+                                <label>Affected People Count</label>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    value={affectedPeopleCount}
+                                    onChange={(e) => setAffectedPeopleCount(Number(e.target.value) || 1)}
                                 />
                             </div>
 

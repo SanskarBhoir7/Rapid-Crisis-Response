@@ -1,70 +1,59 @@
-# Getting Started with Create React App
+# Disaster Response Dashboard (Frontend)
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Frontend for the hospitality crisis-response command center.
 
-## Available Scripts
+## Environment
 
-In the project directory, you can run:
+Create `.env` in this folder:
 
-### `npm start`
+```env
+REACT_APP_GOOGLE_MAPS_API_KEY=your_google_maps_browser_key
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## Run
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+```bash
+npm install
+npm start
+```
 
-### `npm test`
+App runs at `http://localhost:3000`.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### If You See ENOENT package.json
 
-### `npm run build`
+This frontend is in `disaster-response-dashboard/`.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+If you run `npm install` from repo root, it fails because there is no root `package.json`.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Correct options:
+```bash
+cd disaster-response-dashboard
+npm install
+npm start
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Or from root:
+```bash
+npm install --prefix disaster-response-dashboard
+npm start --prefix disaster-response-dashboard
+```
 
-### `npm run eject`
+## Quick Test
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+1. Open dashboard and ensure map loads.
+2. Confirm header shows `BRIDGE: LIVE` or `BRIDGE: MOCK`.
+3. Submit a report from `REPORT INCIDENT` with location.
+4. Verify incident appears in feed with hospitality metadata.
+5. Open incident, update lifecycle status, and verify timeline updates.
+6. Dispatch a unit and confirm auto `On Scene` update when vehicle arrives.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Validate Build
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```bash
+npm test
+npm run build
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Notes
 
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- Full project setup and backend verification steps are documented in [../README.md](../README.md).
