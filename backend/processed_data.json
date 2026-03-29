@@ -1,5 +1,52 @@
 [
     {
+        "id": 1774784264740,
+        "original_message": "Silent panic button triggered. Dispatch nearest responders immediately.",
+        "category": "Panic Alert",
+        "priority": "Critical",
+        "urgency": "Life-threatening",
+        "need_type": [
+            "Police",
+            "Medical"
+        ],
+        "summary": "Panic button activated at Hospitality Venue",
+        "severity_score": 10,
+        "coordinates": {
+            "lat": 19.20991986560782,
+            "lng": 72.87748481001832
+        },
+        "location": "Panic Button Trigger",
+        "location_text": "Hospitality Venue Unknown Panic Trigger Zone",
+        "venue_name": "Hospitality Venue",
+        "floor": "Unknown",
+        "room_or_zone": "Panic Trigger Zone",
+        "reporter_type": "Staff",
+        "source": "panic_button",
+        "channel": "silent_alarm",
+        "panic_code": "PANIC-01",
+        "affected_people_count": 1,
+        "authenticity_score": 10,
+        "reasoning": "Direct panic trigger from hospitality staff channel.",
+        "flags": [],
+        "status": "Dispatched",
+        "status_timeline": [
+            {
+                "status": "Created",
+                "timestamp": "2026-03-29T17:07:44.740887",
+                "actor": "panic-button",
+                "note": "Panic alert triggered via PANIC-01"
+            },
+            {
+                "status": "Dispatched",
+                "timestamp": "2026-03-29T17:07:44.934017",
+                "actor": "dispatcher",
+                "note": "Unit amb-2 dispatched"
+            }
+        ],
+        "timestamp": "2026-03-29T17:07:44.740887",
+        "assigned_vehicle": "amb-2"
+    },
+    {
         "id": 1774453083635,
         "original_message": "Silent panic button triggered. Dispatch nearest responders immediately.",
         "category": "Panic Alert",
@@ -168,7 +215,30 @@
             "Forest Dept",
             "Police"
         ],
-        "timestamp": "2026-02-10T17:56:33.504702"
+        "timestamp": "2026-02-10T17:56:33.504702",
+        "status": "Dispatched",
+        "status_timeline": [
+            {
+                "status": "Created",
+                "timestamp": "2026-02-10T17:56:33.504702",
+                "actor": "system",
+                "note": "Incident registered"
+            },
+            {
+                "status": "Dispatched",
+                "timestamp": "2026-03-29T17:07:30.615730",
+                "actor": "dispatcher",
+                "note": "Unit pol-1 dispatched"
+            }
+        ],
+        "venue_name": "Unknown Venue",
+        "floor": "Unknown",
+        "room_or_zone": "Unknown",
+        "reporter_type": "Guest",
+        "source": "manual_report",
+        "channel": "dashboard",
+        "affected_people_count": 1,
+        "assigned_vehicle": "pol-1"
     },
     {
         "id": 4,
@@ -661,7 +731,36 @@
             "Police",
             "Rescue"
         ],
-        "timestamp": "2026-02-10T18:22:33.504743"
+        "timestamp": "2026-02-10T18:22:33.504743",
+        "status": "On Scene",
+        "status_timeline": [
+            {
+                "status": "Created",
+                "timestamp": "2026-02-10T18:22:33.504743",
+                "actor": "system",
+                "note": "Incident registered"
+            },
+            {
+                "status": "Dispatched",
+                "timestamp": "2026-03-29T17:00:37.789748",
+                "actor": "dispatcher",
+                "note": "Unit fire-1 dispatched"
+            },
+            {
+                "status": "On Scene",
+                "timestamp": "2026-03-29T17:04:04.771240",
+                "actor": "system",
+                "note": "Fire Engine 4 reached destination"
+            }
+        ],
+        "venue_name": "Unknown Venue",
+        "floor": "Unknown",
+        "room_or_zone": "Unknown",
+        "reporter_type": "Guest",
+        "source": "manual_report",
+        "channel": "dashboard",
+        "affected_people_count": 1,
+        "assigned_vehicle": "fire-1"
     },
     {
         "id": 16,
@@ -861,7 +960,36 @@
             "Forest Dept",
             "Police"
         ],
-        "timestamp": "2026-02-10T18:27:33.504763"
+        "timestamp": "2026-02-10T18:27:33.504763",
+        "status": "On Scene",
+        "status_timeline": [
+            {
+                "status": "Created",
+                "timestamp": "2026-02-10T18:27:33.504763",
+                "actor": "system",
+                "note": "Incident registered"
+            },
+            {
+                "status": "Dispatched",
+                "timestamp": "2026-03-29T17:00:29.782307",
+                "actor": "dispatcher",
+                "note": "Unit pol-1 dispatched"
+            },
+            {
+                "status": "On Scene",
+                "timestamp": "2026-03-29T17:02:45.025335",
+                "actor": "system",
+                "note": "Patrol Alpha reached destination"
+            }
+        ],
+        "venue_name": "Unknown Venue",
+        "floor": "Unknown",
+        "room_or_zone": "Unknown",
+        "reporter_type": "Guest",
+        "source": "manual_report",
+        "channel": "dashboard",
+        "affected_people_count": 1,
+        "assigned_vehicle": "pol-1"
     },
     {
         "id": 22,
@@ -921,7 +1049,7 @@
             "Evacuation"
         ],
         "timestamp": "2026-02-10T18:50:33.504771",
-        "status": "On Scene",
+        "status": "Resolved",
         "status_timeline": [
             {
                 "status": "Created",
@@ -940,6 +1068,12 @@
                 "timestamp": "2026-03-29T16:24:51.889831",
                 "actor": "system",
                 "note": "Fire Engine 4 reached destination"
+            },
+            {
+                "status": "Resolved",
+                "timestamp": "2026-03-29T17:08:52.950767",
+                "actor": "operator",
+                "note": "Manually set to Resolved"
             }
         ],
         "venue_name": "Unknown Venue",
@@ -967,7 +1101,30 @@
             "Police",
             "Rescue"
         ],
-        "timestamp": "2026-02-10T18:09:33.504774"
+        "timestamp": "2026-02-10T18:09:33.504774",
+        "status": "Dispatched",
+        "status_timeline": [
+            {
+                "status": "Created",
+                "timestamp": "2026-02-10T18:09:33.504774",
+                "actor": "system",
+                "note": "Incident registered"
+            },
+            {
+                "status": "Dispatched",
+                "timestamp": "2026-03-29T17:07:19.230142",
+                "actor": "dispatcher",
+                "note": "Unit amb-1 dispatched"
+            }
+        ],
+        "venue_name": "Unknown Venue",
+        "floor": "Unknown",
+        "room_or_zone": "Unknown",
+        "reporter_type": "Guest",
+        "source": "manual_report",
+        "channel": "dashboard",
+        "affected_people_count": 1,
+        "assigned_vehicle": "amb-1"
     },
     {
         "id": 25,
@@ -1364,7 +1521,30 @@
             "Forest Dept",
             "Police"
         ],
-        "timestamp": "2026-02-10T18:26:33.504806"
+        "timestamp": "2026-02-10T18:26:33.504806",
+        "status": "Dispatched",
+        "status_timeline": [
+            {
+                "status": "Created",
+                "timestamp": "2026-02-10T18:26:33.504806",
+                "actor": "system",
+                "note": "Incident registered"
+            },
+            {
+                "status": "Dispatched",
+                "timestamp": "2026-03-29T17:07:14.280816",
+                "actor": "dispatcher",
+                "note": "Unit amb-1 dispatched"
+            }
+        ],
+        "venue_name": "Unknown Venue",
+        "floor": "Unknown",
+        "room_or_zone": "Unknown",
+        "reporter_type": "Guest",
+        "source": "manual_report",
+        "channel": "dashboard",
+        "affected_people_count": 1,
+        "assigned_vehicle": "amb-1"
     },
     {
         "id": 35,
@@ -1382,7 +1562,36 @@
             "Forest Dept",
             "Police"
         ],
-        "timestamp": "2026-02-10T18:49:33.504809"
+        "timestamp": "2026-02-10T18:49:33.504809",
+        "status": "On Scene",
+        "status_timeline": [
+            {
+                "status": "Created",
+                "timestamp": "2026-02-10T18:49:33.504809",
+                "actor": "system",
+                "note": "Incident registered"
+            },
+            {
+                "status": "Dispatched",
+                "timestamp": "2026-03-29T17:00:22.982687",
+                "actor": "dispatcher",
+                "note": "Unit amb-2 dispatched"
+            },
+            {
+                "status": "On Scene",
+                "timestamp": "2026-03-29T17:04:08.279011",
+                "actor": "system",
+                "note": "Ambulance 2 reached destination"
+            }
+        ],
+        "venue_name": "Unknown Venue",
+        "floor": "Unknown",
+        "room_or_zone": "Unknown",
+        "reporter_type": "Guest",
+        "source": "manual_report",
+        "channel": "dashboard",
+        "affected_people_count": 1,
+        "assigned_vehicle": "amb-2"
     },
     {
         "id": 36,
@@ -1400,7 +1609,36 @@
             "Police",
             "Rescue"
         ],
-        "timestamp": "2026-02-10T18:48:33.504813"
+        "timestamp": "2026-02-10T18:48:33.504813",
+        "status": "On Scene",
+        "status_timeline": [
+            {
+                "status": "Created",
+                "timestamp": "2026-02-10T18:48:33.504813",
+                "actor": "system",
+                "note": "Incident registered"
+            },
+            {
+                "status": "Dispatched",
+                "timestamp": "2026-03-29T17:00:11.397907",
+                "actor": "dispatcher",
+                "note": "Unit amb-1 dispatched"
+            },
+            {
+                "status": "On Scene",
+                "timestamp": "2026-03-29T17:02:42.721104",
+                "actor": "system",
+                "note": "Ambulance 1 reached destination"
+            }
+        ],
+        "venue_name": "Unknown Venue",
+        "floor": "Unknown",
+        "room_or_zone": "Unknown",
+        "reporter_type": "Guest",
+        "source": "manual_report",
+        "channel": "dashboard",
+        "affected_people_count": 1,
+        "assigned_vehicle": "amb-1"
     },
     {
         "id": 3737,
@@ -1800,7 +2038,7 @@
             "Municipality"
         ],
         "timestamp": "2026-02-10T18:52:33.504845",
-        "status": "Dispatched",
+        "status": "Resolved",
         "status_timeline": [
             {
                 "status": "Created",
@@ -1813,6 +2051,12 @@
                 "timestamp": "2026-03-29T16:31:11.568242",
                 "actor": "dispatcher",
                 "note": "Unit pol-1 dispatched"
+            },
+            {
+                "status": "Resolved",
+                "timestamp": "2026-03-29T17:08:44.932399",
+                "actor": "operator",
+                "note": "Manually set to Resolved"
             }
         ],
         "venue_name": "Unknown Venue",
