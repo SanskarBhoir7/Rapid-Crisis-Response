@@ -3,31 +3,34 @@ import os
 import time
 import requests
 from datetime import datetime
+from pathlib import Path
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 from dotenv import load_dotenv
 
 # Load environment variables
-load_dotenv()
+BASE_DIR = Path(__file__).resolve().parent
+load_dotenv(dotenv_path=BASE_DIR / ".env")
 
 app = Flask(__name__)
 CORS(app)
 
 # --- Configuration ---
-PROCESSED_DATA_FILE = "processed_data.json"
-BRIDGE_EVENTS_FILE = "bridge_events.json"
+PROCESSED_DATA_FILE = str(BASE_DIR / "processed_data.json")
+BRIDGE_EVENTS_FILE = str(BASE_DIR / "bridge_events.json")
 RESCUE_HQ_COORDS = "18.9486,72.8336"
 GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
 EMERGENCY_WEBHOOK_URL = os.getenv("EMERGENCY_WEBHOOK_URL")
 
 if not GOOGLE_MAPS_API_KEY:
-    print("Warning: GOOGLE_MAPS_API_KEY not found in environment. Checking .env file...")
-    # Double check if .env exists
-    if os.path.exists(".env"):
-        print(".env file found.")
-    else:
-        print(".env file NOT found.")
-    raise ValueError("Error: GOOGLE_MAPS_API_KEY environment variable is not set.")
+    print("Warning: GOOGLE_MAPS_API_KEY is not set. Route and nearby-place endpoints will return 503.")
+
+
+def _safe_int(value, default):
+    try:
+        return int(value)
+    except (ValueError, TypeError):
+        return default
 
 
 def _priority_from_severity(severity_score):
@@ -40,7 +43,7 @@ def _priority_from_severity(severity_score):
 
 def _normalize_incident(incident):
     """Backfill required fields so mixed legacy/new data remains UI-compatible."""
-    severity_score = int(incident.get("severity_score", 5))
+    severity_score = _safe_int(incident.get("severity_score", 5), 5)
     priority = incident.get("priority") or _priority_from_severity(severity_score)
     timestamp = incident.get("timestamp") or datetime.now().isoformat()
     status = incident.get("status") or "Created"
@@ -57,17 +60,14 @@ def _normalize_incident(incident):
     incident["priority"] = priority
     incident["status"] = status
     incident["timestamp"] = timestamp
-    incident["status_timeline"] = status_timeline
+    incident["status_timeline"] = status_timeline if isinstance(status_timeline, list) else []
     incident["venue_name"] = incident.get("venue_name") or "Unknown Venue"
     incident["floor"] = incident.get("floor") or "Unknown"
     incident["room_or_zone"] = incident.get("room_or_zone") or "Unknown"
     incident["reporter_type"] = incident.get("reporter_type") or "Guest"
     incident["source"] = incident.get("source") or "manual_report"
     incident["channel"] = incident.get("channel") or "dashboard"
-    try:
-        incident["affected_people_count"] = int(incident.get("affected_people_count", 1))
-    except (ValueError, TypeError):
-        incident["affected_people_count"] = 1
+    incident["affected_people_count"] = max(1, _safe_int(incident.get("affected_people_count", 1), 1))
 
     return incident
 
@@ -114,7 +114,10 @@ def _load_incidents():
         return []
     try:
         with open(PROCESSED_DATA_FILE, 'r', encoding='utf-8') as f:
-            return json.load(f)
+            data = json.load(f)
+            if not isinstance(data, list):
+                raise ValueError("Processed incidents file must contain a JSON array.")
+            return data
     except json.JSONDecodeError as e:
         raise ValueError(f"Processed incidents file is invalid JSON: {e}") from e
 
@@ -130,7 +133,14 @@ def _load_bridge_events():
     if not os.path.exists(BRIDGE_EVENTS_FILE):
         return []
     with open(BRIDGE_EVENTS_FILE, 'r', encoding='utf-8') as f:
-        return json.load(f)
+        events = json.load(f)
+        if isinstance(events, list):
+            return events
+        return []
+
+
+def _google_maps_config_error():
+    return jsonify({"error": "GOOGLE_MAPS_API_KEY is not configured on the backend."}), 503
 
 
 def _save_bridge_events(events):
@@ -273,7 +283,9 @@ def bridge_events():
 
 @app.route('/get_route', methods=['GET'])
 def get_route():
-    # This function remains the same...
+    if not GOOGLE_MAPS_API_KEY:
+        return _google_maps_config_error()
+
     destination_lat = request.args.get('lat')
     destination_lng = request.args.get('lng')
     start_lat = request.args.get('start_lat')
@@ -288,7 +300,7 @@ def get_route():
     url = "https://maps.googleapis.com/maps/api/directions/json"
     params = {'origin': origin, 'destination': destination_coords, 'key': GOOGLE_MAPS_API_KEY}
     try:
-        response = requests.get(url, params=params)
+        response = requests.get(url, params=params, timeout=8)
         response.raise_for_status()
         directions = response.json()
         if directions['status'] == 'OK':
@@ -315,6 +327,9 @@ def get_nearby_places():
     """
     lat = request.args.get('lat')
     lng = request.args.get('lng')
+    if not GOOGLE_MAPS_API_KEY:
+        return _google_maps_config_error()
+
     if not lat or not lng:
         return jsonify({"error": "Missing latitude or longitude parameters."}), 400
 
@@ -331,7 +346,7 @@ def get_nearby_places():
             'key': GOOGLE_MAPS_API_KEY
         }
         try:
-            response = requests.get(url, params=params)
+            response = requests.get(url, params=params, timeout=8)
             response.raise_for_status()
             results = response.json().get('results', [])
             # We only need the name and location for the map
@@ -443,7 +458,7 @@ def report_incident():
         _save_incidents(current_data)
             
         print("Incident saved successfully.")
-        return jsonify({"message": "Incident reported successfully", "incident": new_incident})
+        return jsonify({"message": "Incident reported successfully", "incident": normalized_incident})
 
     except Exception as e:
         print(f"Error saving incident: {e}")
