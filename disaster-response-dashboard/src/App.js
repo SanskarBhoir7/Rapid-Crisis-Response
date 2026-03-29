@@ -2,12 +2,14 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { APIProvider, Map as GoogleMap, AdvancedMarker, useMap } from '@vis.gl/react-google-maps';
 import { decode } from '@googlemaps/polyline-codec';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertCircle, MapPin, Activity, Shield, Flame, Truck, AlertTriangle } from 'lucide-react';
+import { AlertCircle, MapPin, Activity, Shield, Flame, Truck, AlertTriangle, Search, BarChart3, Map as MapIcon } from 'lucide-react';
 import ReportModal from './ReportModal';
 import VehicleDetailPanel from './VehicleDetailPanel';
 import IncidentDetailPanel from './IncidentDetailPanel';
 import FleetDropdown from './FleetDropdown';
 import IntroOverlay from './IntroOverlay';
+import NotificationToast from './NotificationToast';
+import AnalyticsDashboard from './AnalyticsDashboard';
 import './App.css';
 
 // --- CONTROLS COMPONENT ---
@@ -169,7 +171,7 @@ function calculateResponseKpis(incidents) {
 
 // --- MAIN APP COMPONENT ---
 function App() {
-  const [showIntro, setShowIntro] = useState(false); // Disabled by user request
+  const [showIntro, setShowIntro] = useState(false);
   const [sosData, setSosData] = useState([]);
   const [selectedIncident, setSelectedIncident] = useState(null);
   const [selectedVehicle, setSelectedVehicle] = useState(null);
@@ -180,6 +182,14 @@ function App() {
   const [situation, setSituation] = useState({ temp: "--", cond: "Loading...", insight: "Connecting to AI satellite..." });
   const [bridgeMode, setBridgeMode] = useState({ mode: 'unknown', webhook_configured: false });
   const [bridgeEvents, setBridgeEvents] = useState([]);
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [filterText, setFilterText] = useState('');
+  const [filterCategory, setFilterCategory] = useState('All');
+  const [filterPriority, setFilterPriority] = useState('All');
+  const [filterStatus, setFilterStatus] = useState('All');
+  const alertAudioRef = useRef(null);
+  const knownIdsRef = useRef(new Set());
   const [kpis, setKpis] = useState({
     avgAcknowledgeMins: null,
     avgDispatchMins: null,
@@ -295,7 +305,34 @@ function App() {
     fetchBridgeStatus();
     fetchBridgeEvents();
 
-    const sosInterval = setInterval(fetchSos, 5000);
+    // SSE connection for real-time updates
+    let eventSource;
+    try {
+      eventSource = new EventSource('http://127.0.0.1:5001/stream');
+      eventSource.addEventListener('new_incident', (e) => {
+        try {
+          const incident = JSON.parse(e.data);
+          setSosData(prev => {
+            if (prev.some(i => i.id === incident.id)) return prev;
+            return [incident, ...prev];
+          });
+          // Show toast for critical incidents
+          if ((incident.severity_score || 0) >= 8) {
+            setNotifications(prev => [incident, ...prev].slice(0, 5));
+            try { if (alertAudioRef.current) alertAudioRef.current.play().catch(() => {}); } catch (_) {}
+          }
+        } catch (_) {}
+      });
+      eventSource.addEventListener('status_update', (e) => {
+        try {
+          const updated = JSON.parse(e.data);
+          setSosData(prev => prev.map(inc => inc.id === updated.id ? updated : inc));
+          setSelectedIncident(prev => prev && prev.id === updated.id ? updated : prev);
+        } catch (_) {}
+      });
+    } catch (_) {}
+
+    const sosInterval = setInterval(fetchSos, 8000);  // SSE supplements, poll is fallback
     const situationInterval = setInterval(fetchSituation, 60000);
     const bridgeStatusInterval = setInterval(fetchBridgeStatus, 60000);
     const bridgeEventsInterval = setInterval(fetchBridgeEvents, 7000);
@@ -305,6 +342,7 @@ function App() {
       clearInterval(situationInterval);
       clearInterval(bridgeStatusInterval);
       clearInterval(bridgeEventsInterval);
+      if (eventSource) eventSource.close();
     };
   }, []);
 
@@ -593,7 +631,43 @@ function App() {
 
   useEffect(() => {
     setKpis(calculateResponseKpis(sosData));
+    // Track known IDs for toast dedup
+    sosData.forEach(i => knownIdsRef.current.add(i.id));
   }, [sosData]);
+
+  const dismissNotification = useCallback((id) => {
+    setNotifications(prev => prev.filter(n => n.id !== id));
+  }, []);
+
+  const focusNotification = useCallback((incident) => {
+    setSelectedIncident(incident);
+    setNotifications(prev => prev.filter(n => n.id !== incident.id));
+  }, []);
+
+  // Auto-dismiss toasts after 8 seconds
+  useEffect(() => {
+    if (notifications.length === 0) return;
+    const timer = setTimeout(() => {
+      setNotifications(prev => prev.slice(0, -1));
+    }, 8000);
+    return () => clearTimeout(timer);
+  }, [notifications]);
+
+  // Derive unique categories for filter
+  const allCategories = [...new Set(sosData.map(i => i.category).filter(Boolean))];
+
+  // Apply filters
+  const filteredSosData = sosData.filter(item => {
+    if (filterCategory !== 'All' && item.category !== filterCategory) return false;
+    if (filterPriority !== 'All' && item.priority !== filterPriority) return false;
+    if (filterStatus !== 'All' && item.status !== filterStatus) return false;
+    if (filterText) {
+      const q = filterText.toLowerCase();
+      const searchable = `${item.original_message} ${item.venue_name} ${item.location_text || item.location} ${item.category}`.toLowerCase();
+      if (!searchable.includes(q)) return false;
+    }
+    return true;
+  });
 
   useEffect(() => {
     const arrivals = resources.filter(res => res.justArrived && res.target_incident_id);
@@ -641,7 +715,14 @@ function App() {
             </div>
           </div>
 
-          <div className="header-actions">
+            <div className="header-actions">
+            <button
+              className={`analytics-toggle-btn ${showAnalytics ? 'active' : ''}`}
+              onClick={() => setShowAnalytics(!showAnalytics)}
+              title={showAnalytics ? 'Show Map' : 'Show Analytics'}
+            >
+              {showAnalytics ? <><MapIcon size={16} /> MAP</> : <><BarChart3 size={16} /> ANALYTICS</>}
+            </button>
             <div className={`bridge-badge ${bridgeMode.mode === 'live' ? 'live' : 'mock'}`}>
               BRIDGE: {bridgeMode.mode === 'live' ? 'LIVE' : bridgeMode.mode === 'mock' ? 'MOCK' : 'UNKNOWN'}
             </div>
@@ -721,8 +802,43 @@ function App() {
             </div>
 
             <h2>Live SOS Feed</h2>
+
+            {/* --- FILTER BAR --- */}
+            <div className="filter-bar">
+              <div className="filter-search">
+                <Search size={14} />
+                <input
+                  type="text"
+                  placeholder="Search incidents..."
+                  value={filterText}
+                  onChange={(e) => setFilterText(e.target.value)}
+                />
+              </div>
+              <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
+                <option value="All">All Categories</option>
+                {allCategories.map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+              <select value={filterPriority} onChange={(e) => setFilterPriority(e.target.value)}>
+                <option value="All">All Priorities</option>
+                <option value="Critical">Critical</option>
+                <option value="High">High</option>
+                <option value="Moderate">Moderate</option>
+              </select>
+              <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
+                <option value="All">All Statuses</option>
+                <option value="Created">Created</option>
+                <option value="Acknowledged">Acknowledged</option>
+                <option value="Dispatched">Dispatched</option>
+                <option value="En Route">En Route</option>
+                <option value="On Scene">On Scene</option>
+                <option value="Resolved">Resolved</option>
+              </select>
+            </div>
+
             <div className="sos-feed">
-              {loading ? <p>Loading data...</p> : sosData.map(item => (
+              {loading ? <p>Loading data...</p> : filteredSosData.length === 0 ? (
+                <p className="no-incidents">No incidents match your filters.</p>
+              ) : filteredSosData.map(item => (
                 <motion.div
                   key={item.id}
                   className={`sos-card priority-${item.priority.toLowerCase()}`}
@@ -757,7 +873,12 @@ function App() {
             </div>
           </div>
 
-          {/* MAP AREA */}
+          {/* MAP AREA or ANALYTICS */}
+          {showAnalytics ? (
+            <div className="analytics-wrapper">
+              <AnalyticsDashboard />
+            </div>
+          ) : (
           <div className="map-wrapper">
             <GoogleMap
               defaultCenter={mumbaiCenter}
@@ -807,7 +928,20 @@ function App() {
               ))}
             </GoogleMap>
           </div>
+          )}
         </div>
+
+        {/* NOTIFICATIONS */}
+        <NotificationToast
+          notifications={notifications}
+          onDismiss={dismissNotification}
+          onFocus={focusNotification}
+        />
+
+        {/* Hidden audio element for alert sounds */}
+        <audio ref={alertAudioRef} preload="auto">
+          <source src="data:audio/wav;base64,UklGRiQDAABXQVZFZm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQADAAB/f39/f39/f4B/gH+Af4B/f39/f39/f39/f39/f39/gH+Af4B/gH9/f39/f39/f39/eH94f3h/eH94f3h/d393f3d/d393f3d/d393f3Z/dn92f3Z/dn92f3V/dX91f3V/dX91f3R/dH90f3R/dH90f3N/c39zf3N/c39zf3J/cn9yf3J/cn9yf3F/cX9xf3F/cX9xf3B/cH9wf3B/cH9wf29/b39vf29/b39vf25/bn9uf21/bX9tf2x/bH9sf2t/a39rf2p/a39rf2x/bH9sf21/bX9tf25/bn9uf29/b39vf3B/cH9wf3F/cX9xf3J/cn9yf3N/c39zf3R/dH90f3V/dX91f3Z/dn92f3d/d393f3h/eH94f3l/eX95f3p/en96f3t/e397f3x/fH98f31/fX99f35/fn9+f39/f39/f4B/gH+Af4F/gX+Bf4J/gn+Cf4N/g3+Df4R/hH+Ef4V/hX+Ff4Z/hn+Gf4d/h3+Hf4h/iH+If4l/iX+Jf4p/in+Kf4t/i3+Lf4x/jH+Mf41/jX+Nf45/jn+Of49/j3+Pf5B/kH+Qf5F/kX+Rf5J/kn+Sf5N/k3+Tf5R/lH+Uf5V/lX+Vf5Z/ln+Wf5d/l3+Xf5h/mH+Yf5l/mX+Zf5p/mn+af5t/m3+bf5x/nH+cf5x/nH+cf5t/m3+bf5p/mn+af5l/mX+Zf5h/mH+Yf5d/l3+Xf5Z/ln+Wf5V/lX+Vf5R/lH+Uf5N/k3+Tf5J/kn+Sf5F/kX+Rf5B/kH+Qf49/j3+Pf45/jn+Of41/jX+Nf4x/jH+Mf4t/i3+Lf4p/in+Kf4l/iX+Jf4h/iH+If4d/h3+Hf4Z/hn+Gf4V/hX+Ff4R/hH+Ef4N/g3+Df4J/gn+Cf4F/gX+Bf4B/gH+Af39/f39/f35/fn9+f31/fX99f3x/fH98f3t/e397f3p/en96f3l/eX95f3h/eH94f3d/d393f3Z/dn92f3V/dX91f3R/dH90f3N/c39zf3J/cn9yf3F/cX9x" type="audio/wav" />
+        </audio>
 
         {/* MODALS & PANELS */}
         <ReportModal

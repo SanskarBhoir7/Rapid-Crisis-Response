@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { AlertTriangle, MapPin, Clock, Truck, Shield, Activity, X, Navigation } from 'lucide-react';
+import { AlertTriangle, MapPin, Clock, Truck, Shield, Activity, X, Navigation, MessageSquare, Send } from 'lucide-react';
 import './App.css';
 
 export default function IncidentDetailPanel({ incident, onClose, onAssign, onStatusChange, vehicles }) {
@@ -138,7 +138,86 @@ export default function IncidentDetailPanel({ incident, onClose, onAssign, onSta
                         )}
                     </div>
                 </section>
+
+                <CommLogSection incidentId={incident.id} />
             </div>
         </motion.div>
+    );
+}
+
+
+function CommLogSection({ incidentId }) {
+    const [notes, setNotes] = useState([]);
+    const [newMsg, setNewMsg] = useState('');
+    const [sending, setSending] = useState(false);
+
+    const fetchNotes = useCallback(async () => {
+        try {
+            const res = await fetch(`http://127.0.0.1:5001/incident_notes/${incidentId}`);
+            if (res.ok) {
+                const data = await res.json();
+                if (Array.isArray(data)) setNotes(data);
+            }
+        } catch (_) {}
+    }, [incidentId]);
+
+    useEffect(() => {
+        fetchNotes();
+        const interval = setInterval(fetchNotes, 6000);
+        return () => clearInterval(interval);
+    }, [fetchNotes]);
+
+    const handleSend = async () => {
+        const msg = newMsg.trim();
+        if (!msg) return;
+        setSending(true);
+        try {
+            const res = await fetch('http://127.0.0.1:5001/incident_notes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ incident_id: incidentId, message: msg, author: 'operator' }),
+            });
+            if (res.ok) {
+                const data = await res.json();
+                if (data.note) setNotes(prev => [data.note, ...prev]);
+                setNewMsg('');
+            }
+        } catch (err) {
+            console.error('Failed to send note:', err);
+        } finally {
+            setSending(false);
+        }
+    };
+
+    return (
+        <section className="detail-section">
+            <h3><MessageSquare size={16} /> Communication Log</h3>
+            <div className="comm-input-row">
+                <input
+                    type="text"
+                    placeholder="Add a note..."
+                    value={newMsg}
+                    onChange={(e) => setNewMsg(e.target.value)}
+                    onKeyDown={(e) => { if (e.key === 'Enter') handleSend(); }}
+                    disabled={sending}
+                />
+                <button className="comm-send-btn" onClick={handleSend} disabled={sending || !newMsg.trim()}>
+                    <Send size={14} />
+                </button>
+            </div>
+            <div className="comm-log-list">
+                {notes.length === 0 ? (
+                    <p className="no-incidents">No notes yet. Add the first one above.</p>
+                ) : notes.slice(0, 20).map((note) => (
+                    <div key={note.id} className="comm-log-item">
+                        <div className="comm-log-header">
+                            <span className="comm-author">{note.author}</span>
+                            <span className="comm-time">{new Date(note.timestamp).toLocaleTimeString()}</span>
+                        </div>
+                        <p className="comm-msg">{note.message}</p>
+                    </div>
+                ))}
+            </div>
+        </section>
     );
 }

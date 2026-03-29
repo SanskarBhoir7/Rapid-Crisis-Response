@@ -1,10 +1,12 @@
 import json
+import logging
 import os
+import queue
 import time
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, Response
 from flask_cors import CORS
 from dotenv import load_dotenv
 
@@ -12,18 +14,30 @@ from dotenv import load_dotenv
 BASE_DIR = Path(__file__).resolve().parent
 load_dotenv(dotenv_path=BASE_DIR / ".env")
 
+# --- Structured Logging ---
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+log = logging.getLogger("crisis-api")
+
 app = Flask(__name__)
 CORS(app)
 
 # --- Configuration ---
 PROCESSED_DATA_FILE = str(BASE_DIR / "processed_data.json")
 BRIDGE_EVENTS_FILE = str(BASE_DIR / "bridge_events.json")
+INCIDENT_NOTES_FILE = str(BASE_DIR / "incident_notes.json")
 RESCUE_HQ_COORDS = "18.9486,72.8336"
 GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
 EMERGENCY_WEBHOOK_URL = os.getenv("EMERGENCY_WEBHOOK_URL")
 
 if not GOOGLE_MAPS_API_KEY:
-    print("Warning: GOOGLE_MAPS_API_KEY is not set. Route and nearby-place endpoints will return 503.")
+    log.warning("GOOGLE_MAPS_API_KEY is not set. Route and nearby-place endpoints will return 503.")
+
+# --- SSE Client Registry ---
+_sse_clients: list[queue.Queue] = []
 
 
 def _safe_int(value, default):
@@ -208,7 +222,7 @@ def _send_emergency_bridge_event(event_type, incident):
     }
 
     if not EMERGENCY_WEBHOOK_URL:
-        print(f"[Bridge] EMERGENCY_WEBHOOK_URL not configured. Mock sent: {event_type} for incident {incident.get('id')}")
+        log.info("[Bridge] EMERGENCY_WEBHOOK_URL not configured. Mock sent: %s for incident %s", event_type, incident.get('id'))
         result = {"delivered": False, "mode": "mock", "reason": "webhook_not_configured"}
         _record_bridge_event(event_type, incident, result)
         return result
@@ -220,15 +234,58 @@ def _send_emergency_bridge_event(event_type, incident):
         _record_bridge_event(event_type, incident, result)
         return result
     except requests.exceptions.RequestException as e:
-        print(f"[Bridge] Failed to send webhook event: {e}")
+        log.error("[Bridge] Failed to send webhook event: %s", e)
         result = {"delivered": False, "mode": "webhook", "error": str(e)}
         _record_bridge_event(event_type, incident, result)
         return result
 
+# --- SSE Helpers ---
+def _broadcast_sse(event_type, data):
+    """Push an event to all connected SSE clients."""
+    message = f"event: {event_type}\ndata: {json.dumps(data)}\n\n"
+    dead = []
+    for q in _sse_clients:
+        try:
+            q.put_nowait(message)
+        except queue.Full:
+            dead.append(q)
+    for q in dead:
+        try:
+            _sse_clients.remove(q)
+        except ValueError:
+            pass
+
+
 # --- API Endpoints ---
+@app.route('/stream')
+def stream():
+    """Server-Sent Events endpoint for real-time incident updates."""
+    def event_stream():
+        q = queue.Queue(maxsize=50)
+        _sse_clients.append(q)
+        try:
+            yield "event: connected\ndata: {}\n\n"
+            while True:
+                try:
+                    message = q.get(timeout=30)
+                    yield message
+                except queue.Empty:
+                    yield ": keepalive\n\n"
+        except GeneratorExit:
+            pass
+        finally:
+            try:
+                _sse_clients.remove(q)
+            except ValueError:
+                pass
+
+    return Response(event_stream(), mimetype='text/event-stream',
+                    headers={'Cache-Control': 'no-cache', 'X-Accel-Buffering': 'no'})
+
+
 @app.route('/get_sos_data', methods=['GET'])
 def get_sos_data():
-    print("\n--- Received request for SOS data ---")
+    log.info("Received request for SOS data")
     try:
         all_data = _load_incidents()
         normalized_data = [_normalize_incident(item) for item in all_data]
@@ -237,7 +294,7 @@ def get_sos_data():
             if item.get("coordinates") and item.get("authenticity_score", 0) >= 4
         ]
         sorted_data = sorted(filtered_data, key=lambda x: x['severity_score'], reverse=True)
-        print(f"Returning {len(sorted_data)} pre-processed and filtered messages.")
+        log.info("Returning %d pre-processed and filtered messages.", len(sorted_data))
         return jsonify(sorted_data)
     except FileNotFoundError:
         return jsonify({"error": "Processed data file not found. Run the pre-processing script."}), 500
@@ -372,7 +429,7 @@ def get_nearby_places():
 @app.route('/report_incident', methods=['POST'])
 def report_incident():
     data = request.json
-    print(f"Received new incident report: {data}")
+    log.info("Received new incident report: %s", data)
     
     # 1. Basic Validation
     if not data or 'description' not in data or 'lat' not in data or 'lng' not in data:
@@ -456,19 +513,22 @@ def report_incident():
 
         # Save back
         _save_incidents(current_data)
-            
-        print("Incident saved successfully.")
+
+        # Broadcast to SSE clients
+        _broadcast_sse("new_incident", normalized_incident)
+
+        log.info("Incident saved successfully.")
         return jsonify({"message": "Incident reported successfully", "incident": normalized_incident})
 
     except Exception as e:
-        print(f"Error saving incident: {e}")
+        log.error("Error saving incident: %s", e)
         return jsonify({"error": "Internal Server Error"}), 500
 
 
 @app.route('/panic_alert', methods=['POST'])
 def panic_alert():
     data = request.json or {}
-    print(f"Received panic alert: {data}")
+    log.info("Received panic alert: %s", data)
 
     if 'lat' not in data or 'lng' not in data:
         return jsonify({"error": "Missing required fields (lat, lng)"}), 400
@@ -541,10 +601,14 @@ def panic_alert():
         current_data.insert(0, normalized_incident)
         _send_emergency_bridge_event("panic_alert_triggered", normalized_incident)
         _save_incidents(current_data)
-        print("Panic alert saved successfully.")
+
+        # Broadcast to SSE clients
+        _broadcast_sse("new_incident", normalized_incident)
+
+        log.info("Panic alert saved successfully.")
         return jsonify({"message": "Panic alert created", "incident": normalized_incident})
     except Exception as e:
-        print(f"Error saving panic alert: {e}")
+        log.error("Error saving panic alert: %s", e)
         return jsonify({"error": "Internal Server Error"}), 500
 
 
@@ -619,7 +683,133 @@ def update_incident_status():
     except Exception as e:
         return jsonify({"error": f"Failed to save incident update: {e}"}), 500
 
+    # Broadcast to SSE clients
+    _broadcast_sse("status_update", incident)
+
     return jsonify({"message": "Incident status updated", "incident": incident})
+
+
+# --- Incident Notes / Communication Log ---
+def _load_notes():
+    if not os.path.exists(INCIDENT_NOTES_FILE):
+        return {}
+    try:
+        with open(INCIDENT_NOTES_FILE, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+            return data if isinstance(data, dict) else {}
+    except (json.JSONDecodeError, FileNotFoundError):
+        return {}
+
+
+def _save_notes(notes):
+    temp_file = f"{INCIDENT_NOTES_FILE}.tmp"
+    with open(temp_file, 'w', encoding='utf-8') as f:
+        json.dump(notes, f, indent=4)
+    os.replace(temp_file, INCIDENT_NOTES_FILE)
+
+
+@app.route('/incident_notes/<incident_id>', methods=['GET'])
+def get_incident_notes(incident_id):
+    notes = _load_notes()
+    return jsonify(notes.get(str(incident_id), []))
+
+
+@app.route('/incident_notes', methods=['POST'])
+def add_incident_note():
+    data = request.json or {}
+    incident_id = str(data.get('incident_id', '')).strip()
+    author = str(data.get('author', 'operator')).strip()
+    message = str(data.get('message', '')).strip()
+
+    if not incident_id or not message:
+        return jsonify({"error": "Missing incident_id or message."}), 400
+
+    note = {
+        "id": int(time.time() * 1000),
+        "author": author,
+        "message": message,
+        "timestamp": datetime.now().isoformat()
+    }
+
+    notes = _load_notes()
+    if incident_id not in notes:
+        notes[incident_id] = []
+    notes[incident_id].insert(0, note)
+    _save_notes(notes)
+
+    _broadcast_sse("new_note", {"incident_id": incident_id, "note": note})
+
+    return jsonify({"message": "Note added", "note": note})
+
+
+# --- Analytics Endpoint ---
+@app.route('/analytics', methods=['GET'])
+def analytics():
+    try:
+        incidents = _load_incidents()
+        normalized = [_normalize_incident(i) for i in incidents]
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+    total = len(normalized)
+    by_category = {}
+    by_priority = {"Critical": 0, "High": 0, "Moderate": 0}
+    by_status = {}
+    resolved_times = []
+    now = datetime.now()
+
+    for inc in normalized:
+        cat = inc.get("category", "Other")
+        by_category[cat] = by_category.get(cat, 0) + 1
+
+        pri = inc.get("priority", "Moderate")
+        if pri in by_priority:
+            by_priority[pri] += 1
+
+        st = inc.get("status", "Created")
+        by_status[st] = by_status.get(st, 0) + 1
+
+        # Compute resolution time from timeline
+        timeline = inc.get("status_timeline", [])
+        created_ts = None
+        resolved_ts = None
+        for entry in timeline:
+            if entry.get("status") == "Created" and not created_ts:
+                try:
+                    created_ts = datetime.fromisoformat(entry["timestamp"])
+                except (ValueError, KeyError):
+                    pass
+            if entry.get("status") == "Resolved" and not resolved_ts:
+                try:
+                    resolved_ts = datetime.fromisoformat(entry["timestamp"])
+                except (ValueError, KeyError):
+                    pass
+        if created_ts and resolved_ts:
+            resolved_times.append((resolved_ts - created_ts).total_seconds() / 60)
+
+    # Hourly distribution (last 24h)
+    hourly = [0] * 24
+    for inc in normalized:
+        try:
+            ts = datetime.fromisoformat(inc.get("timestamp", ""))
+            if (now - ts) < timedelta(hours=24):
+                hourly[ts.hour] += 1
+        except (ValueError, TypeError):
+            pass
+
+    avg_resolve = sum(resolved_times) / len(resolved_times) if resolved_times else None
+
+    return jsonify({
+        "total_incidents": total,
+        "by_category": by_category,
+        "by_priority": by_priority,
+        "by_status": by_status,
+        "avg_resolve_minutes": round(avg_resolve, 1) if avg_resolve else None,
+        "hourly_distribution": hourly,
+        "resolved_count": by_status.get("Resolved", 0),
+        "active_count": total - by_status.get("Resolved", 0),
+    })
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)

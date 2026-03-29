@@ -37,9 +37,6 @@ export default function IntroOverlay({ onComplete }) {
             exit={{ opacity: 0, scale: 1.1, filter: "blur(10px)" }}
             transition={{ duration: 0.8 }}
         >
-            <div className="debug-skip" style={{ position: 'absolute', top: 20, right: 20, zIndex: 10000, cursor: 'pointer', color: 'red', border: '1px solid red', padding: '5px' }} onClick={onComplete}>
-                [DEBUG: FORCE SKIP]
-            </div>
             <div className="scan-line"></div>
 
             <div className="intro-content">
