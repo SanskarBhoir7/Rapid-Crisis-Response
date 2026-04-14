@@ -5,10 +5,17 @@
         "category": "Fire",
         "priority": "Critical",
         "urgency": "Life-threatening",
-        "need_type": ["Fire", "Rescue", "Medical"],
+        "need_type": [
+            "Fire",
+            "Rescue",
+            "Medical"
+        ],
         "summary": "High-rise fire at Antilia Tower with trapped residents",
         "severity_score": 10,
-        "coordinates": { "lat": 18.9716, "lng": 72.8131 },
+        "coordinates": {
+            "lat": 18.9716,
+            "lng": 72.8131
+        },
         "location": "Antilia Tower, Altamount Road",
         "location_text": "Antilia Tower, Altamount Road, Cumballa Hill",
         "venue_name": "Antilia Tower Residences",
@@ -25,9 +32,24 @@
         "status": "Dispatched",
         "assigned_vehicle": "fire-1",
         "status_timeline": [
-            { "status": "Created", "timestamp": "2026-04-14T13:02:00", "actor": "security-system", "note": "Auto-triggered by smoke detectors on Floor 12" },
-            { "status": "Acknowledged", "timestamp": "2026-04-14T13:02:45", "actor": "operator", "note": "Confirmed via CCTV feed" },
-            { "status": "Dispatched", "timestamp": "2026-04-14T13:03:30", "actor": "dispatcher", "note": "Fire Engine 4 dispatched" }
+            {
+                "status": "Created",
+                "timestamp": "2026-04-14T13:02:00",
+                "actor": "security-system",
+                "note": "Auto-triggered by smoke detectors on Floor 12"
+            },
+            {
+                "status": "Acknowledged",
+                "timestamp": "2026-04-14T13:02:45",
+                "actor": "operator",
+                "note": "Confirmed via CCTV feed"
+            },
+            {
+                "status": "Dispatched",
+                "timestamp": "2026-04-14T13:03:30",
+                "actor": "dispatcher",
+                "note": "Fire Engine 4 dispatched"
+            }
         ],
         "timestamp": "2026-04-14T13:02:00"
     },
@@ -37,10 +59,16 @@
         "category": "Flooding",
         "priority": "Critical",
         "urgency": "Life-threatening",
-        "need_type": ["Rescue", "Police"],
+        "need_type": [
+            "Rescue",
+            "Police"
+        ],
         "summary": "Critical flooding with stranded civilians at Hindmata Junction",
         "severity_score": 9,
-        "coordinates": { "lat": 19.0084, "lng": 72.8520 },
+        "coordinates": {
+            "lat": 19.0084,
+            "lng": 72.852
+        },
         "location": "Hindmata Junction, Parel",
         "location_text": "Hindmata Junction, near Parel Station",
         "venue_name": "Hindmata Junction",
@@ -56,10 +84,30 @@
         "status": "En Route",
         "assigned_vehicle": "pol-1",
         "status_timeline": [
-            { "status": "Created", "timestamp": "2026-04-14T12:45:00", "actor": "reporter", "note": "Citizen report via dashboard" },
-            { "status": "Acknowledged", "timestamp": "2026-04-14T12:46:10", "actor": "operator", "note": "Cross-verified with BMC flood sensors" },
-            { "status": "Dispatched", "timestamp": "2026-04-14T12:47:00", "actor": "dispatcher", "note": "Patrol Alpha dispatched" },
-            { "status": "En Route", "timestamp": "2026-04-14T12:48:30", "actor": "system", "note": "Unit navigating alternate route due to road closure" }
+            {
+                "status": "Created",
+                "timestamp": "2026-04-14T12:45:00",
+                "actor": "reporter",
+                "note": "Citizen report via dashboard"
+            },
+            {
+                "status": "Acknowledged",
+                "timestamp": "2026-04-14T12:46:10",
+                "actor": "operator",
+                "note": "Cross-verified with BMC flood sensors"
+            },
+            {
+                "status": "Dispatched",
+                "timestamp": "2026-04-14T12:47:00",
+                "actor": "dispatcher",
+                "note": "Patrol Alpha dispatched"
+            },
+            {
+                "status": "En Route",
+                "timestamp": "2026-04-14T12:48:30",
+                "actor": "system",
+                "note": "Unit navigating alternate route due to road closure"
+            }
         ],
         "timestamp": "2026-04-14T12:45:00"
     },
@@ -69,10 +117,15 @@
         "category": "Medical Emergency",
         "priority": "Critical",
         "urgency": "Life-threatening",
-        "need_type": ["Medical"],
-        "summary": "Cardiac arrest at Taj Palace Hotel — CPR in progress",
+        "need_type": [
+            "Medical"
+        ],
+        "summary": "Cardiac arrest at Taj Palace Hotel \u2014 CPR in progress",
         "severity_score": 10,
-        "coordinates": { "lat": 18.9220, "lng": 72.8332 },
+        "coordinates": {
+            "lat": 18.922,
+            "lng": 72.8332
+        },
         "location": "Taj Palace Hotel, Colaba",
         "location_text": "Taj Mahal Palace Hotel, Apollo Bunder, Colaba",
         "venue_name": "Taj Mahal Palace Hotel",
@@ -89,11 +142,36 @@
         "status": "On Scene",
         "assigned_vehicle": "amb-1",
         "status_timeline": [
-            { "status": "Created", "timestamp": "2026-04-14T12:30:00", "actor": "panic-button", "note": "Panic alert triggered at lobby reception" },
-            { "status": "Acknowledged", "timestamp": "2026-04-14T12:30:20", "actor": "operator", "note": "Confirmed. Guest unresponsive." },
-            { "status": "Dispatched", "timestamp": "2026-04-14T12:30:45", "actor": "dispatcher", "note": "Ambulance 1 dispatched" },
-            { "status": "En Route", "timestamp": "2026-04-14T12:31:00", "actor": "system", "note": "ETA 8 minutes" },
-            { "status": "On Scene", "timestamp": "2026-04-14T12:38:00", "actor": "system", "note": "Ambulance 1 arrived. Paramedics taking over CPR." }
+            {
+                "status": "Created",
+                "timestamp": "2026-04-14T12:30:00",
+                "actor": "panic-button",
+                "note": "Panic alert triggered at lobby reception"
+            },
+            {
+                "status": "Acknowledged",
+                "timestamp": "2026-04-14T12:30:20",
+                "actor": "operator",
+                "note": "Confirmed. Guest unresponsive."
+            },
+            {
+                "status": "Dispatched",
+                "timestamp": "2026-04-14T12:30:45",
+                "actor": "dispatcher",
+                "note": "Ambulance 1 dispatched"
+            },
+            {
+                "status": "En Route",
+                "timestamp": "2026-04-14T12:31:00",
+                "actor": "system",
+                "note": "ETA 8 minutes"
+            },
+            {
+                "status": "On Scene",
+                "timestamp": "2026-04-14T12:38:00",
+                "actor": "system",
+                "note": "Ambulance 1 arrived. Paramedics taking over CPR."
+            }
         ],
         "timestamp": "2026-04-14T12:30:00"
     },
@@ -103,10 +181,17 @@
         "category": "Structure Collapse",
         "priority": "Critical",
         "urgency": "Life-threatening",
-        "need_type": ["Fire", "Medical", "Police"],
+        "need_type": [
+            "Fire",
+            "Medical",
+            "Police"
+        ],
         "summary": "Building collapse with trapped workers at Lokhandwala",
         "severity_score": 10,
-        "coordinates": { "lat": 19.1449, "lng": 72.8340 },
+        "coordinates": {
+            "lat": 19.1449,
+            "lng": 72.834
+        },
         "location": "Lokhandwala Complex, Andheri West",
         "location_text": "Construction site, Lokhandwala Complex, Andheri W",
         "venue_name": "Lokhandwala Construction Site",
@@ -119,12 +204,29 @@
         "authenticity_score": 10,
         "reasoning": "Multiple corroborating reports received. NDRF alerted.",
         "flags": [],
-        "status": "Acknowledged",
+        "status": "Dispatched",
         "status_timeline": [
-            { "status": "Created", "timestamp": "2026-04-14T13:15:00", "actor": "reporter", "note": "Nearby security guard reported via dashboard" },
-            { "status": "Acknowledged", "timestamp": "2026-04-14T13:16:00", "actor": "operator", "note": "Verified via satellite imagery. NDRF notified." }
+            {
+                "status": "Created",
+                "timestamp": "2026-04-14T13:15:00",
+                "actor": "reporter",
+                "note": "Nearby security guard reported via dashboard"
+            },
+            {
+                "status": "Acknowledged",
+                "timestamp": "2026-04-14T13:16:00",
+                "actor": "operator",
+                "note": "Verified via satellite imagery. NDRF notified."
+            },
+            {
+                "status": "Dispatched",
+                "timestamp": "2026-04-14T21:20:16.245068",
+                "actor": "dispatcher",
+                "note": "Unit fire-1 dispatched"
+            }
         ],
-        "timestamp": "2026-04-14T13:15:00"
+        "timestamp": "2026-04-14T13:15:00",
+        "assigned_vehicle": "fire-1"
     },
     {
         "id": 1005,
@@ -132,10 +234,16 @@
         "category": "Crowd Emergency",
         "priority": "Critical",
         "urgency": "Life-threatening",
-        "need_type": ["Police", "Medical"],
+        "need_type": [
+            "Police",
+            "Medical"
+        ],
         "summary": "Crowd surge with injuries at Dadar station",
         "severity_score": 9,
-        "coordinates": { "lat": 19.0186, "lng": 72.8428 },
+        "coordinates": {
+            "lat": 19.0186,
+            "lng": 72.8428
+        },
         "location": "Dadar Railway Station",
         "location_text": "Dadar Railway Station, Platform 4-5",
         "venue_name": "Dadar Railway Station",
@@ -150,7 +258,12 @@
         "flags": [],
         "status": "Created",
         "status_timeline": [
-            { "status": "Created", "timestamp": "2026-04-14T13:25:00", "actor": "reporter", "note": "Railway staff reported crowd emergency" }
+            {
+                "status": "Created",
+                "timestamp": "2026-04-14T13:25:00",
+                "actor": "reporter",
+                "note": "Railway staff reported crowd emergency"
+            }
         ],
         "timestamp": "2026-04-14T13:25:00"
     },
@@ -160,10 +273,16 @@
         "category": "Gas Leak",
         "priority": "High",
         "urgency": "Urgent",
-        "need_type": ["Fire", "Police"],
-        "summary": "Kitchen gas leak at The Oberoi — partial evacuation",
+        "need_type": [
+            "Fire",
+            "Police"
+        ],
+        "summary": "Kitchen gas leak at The Oberoi \u2014 partial evacuation",
         "severity_score": 8,
-        "coordinates": { "lat": 18.9268, "lng": 72.8310 },
+        "coordinates": {
+            "lat": 18.9268,
+            "lng": 72.831
+        },
         "location": "The Oberoi Hotel, Marine Drive",
         "location_text": "The Oberoi Hotel, Nariman Point",
         "venue_name": "The Oberoi Mumbai",
@@ -178,8 +297,18 @@
         "flags": [],
         "status": "Acknowledged",
         "status_timeline": [
-            { "status": "Created", "timestamp": "2026-04-14T13:10:00", "actor": "reporter", "note": "Hotel duty manager reported" },
-            { "status": "Acknowledged", "timestamp": "2026-04-14T13:11:30", "actor": "operator", "note": "Confirmed. Fire department pre-alerted." }
+            {
+                "status": "Created",
+                "timestamp": "2026-04-14T13:10:00",
+                "actor": "reporter",
+                "note": "Hotel duty manager reported"
+            },
+            {
+                "status": "Acknowledged",
+                "timestamp": "2026-04-14T13:11:30",
+                "actor": "operator",
+                "note": "Confirmed. Fire department pre-alerted."
+            }
         ],
         "timestamp": "2026-04-14T13:10:00"
     },
@@ -189,10 +318,17 @@
         "category": "Traffic Accident",
         "priority": "High",
         "urgency": "Urgent",
-        "need_type": ["Police", "Medical", "Fire"],
+        "need_type": [
+            "Police",
+            "Medical",
+            "Fire"
+        ],
         "summary": "Multi-vehicle accident with fuel spill on WEH",
         "severity_score": 8,
-        "coordinates": { "lat": 19.0990, "lng": 72.8489 },
+        "coordinates": {
+            "lat": 19.099,
+            "lng": 72.8489
+        },
         "location": "Western Express Highway, Vile Parle",
         "location_text": "WEH Flyover, near Vile Parle East",
         "venue_name": "Western Express Highway",
@@ -208,9 +344,24 @@
         "status": "Dispatched",
         "assigned_vehicle": "amb-2",
         "status_timeline": [
-            { "status": "Created", "timestamp": "2026-04-14T12:55:00", "actor": "reporter", "note": "Motorist report on WEH pileup" },
-            { "status": "Acknowledged", "timestamp": "2026-04-14T12:56:00", "actor": "operator", "note": "Traffic police confirmed via radio" },
-            { "status": "Dispatched", "timestamp": "2026-04-14T12:57:00", "actor": "dispatcher", "note": "Ambulance 2 dispatched" }
+            {
+                "status": "Created",
+                "timestamp": "2026-04-14T12:55:00",
+                "actor": "reporter",
+                "note": "Motorist report on WEH pileup"
+            },
+            {
+                "status": "Acknowledged",
+                "timestamp": "2026-04-14T12:56:00",
+                "actor": "operator",
+                "note": "Traffic police confirmed via radio"
+            },
+            {
+                "status": "Dispatched",
+                "timestamp": "2026-04-14T12:57:00",
+                "actor": "dispatcher",
+                "note": "Ambulance 2 dispatched"
+            }
         ],
         "timestamp": "2026-04-14T12:55:00"
     },
@@ -220,10 +371,16 @@
         "category": "Fire",
         "priority": "High",
         "urgency": "Urgent",
-        "need_type": ["Fire", "Police"],
+        "need_type": [
+            "Fire",
+            "Police"
+        ],
         "summary": "Transformer explosion at Bandra causing outage and fire risk",
         "severity_score": 7,
-        "coordinates": { "lat": 19.0440, "lng": 72.8210 },
+        "coordinates": {
+            "lat": 19.044,
+            "lng": 72.821
+        },
         "location": "Bandra Reclamation, Bandra West",
         "location_text": "Near Bandra Reclamation, next to SV Road",
         "venue_name": "BEST Transformer Station",
@@ -238,7 +395,12 @@
         "flags": [],
         "status": "Created",
         "status_timeline": [
-            { "status": "Created", "timestamp": "2026-04-14T13:20:00", "actor": "reporter", "note": "Resident near transformer reported explosion" }
+            {
+                "status": "Created",
+                "timestamp": "2026-04-14T13:20:00",
+                "actor": "reporter",
+                "note": "Resident near transformer reported explosion"
+            }
         ],
         "timestamp": "2026-04-14T13:20:00"
     },
@@ -248,10 +410,16 @@
         "category": "Structure Collapse",
         "priority": "High",
         "urgency": "Urgent",
-        "need_type": ["Rescue", "Police"],
+        "need_type": [
+            "Rescue",
+            "Police"
+        ],
         "summary": "Tree fall on building with family inside at Powai",
         "severity_score": 7,
-        "coordinates": { "lat": 19.1176, "lng": 72.9060 },
+        "coordinates": {
+            "lat": 19.1176,
+            "lng": 72.906
+        },
         "location": "Hiranandani Gardens, Powai",
         "location_text": "Hiranandani Gardens, Building D5, Powai",
         "venue_name": "Hiranandani Gardens",
@@ -266,11 +434,36 @@
         "flags": [],
         "status": "Resolved",
         "status_timeline": [
-            { "status": "Created", "timestamp": "2026-04-14T11:00:00", "actor": "reporter", "note": "Family called for help after tree damage" },
-            { "status": "Acknowledged", "timestamp": "2026-04-14T11:02:00", "actor": "operator", "note": "Cross-checked with BMC tree department" },
-            { "status": "Dispatched", "timestamp": "2026-04-14T11:05:00", "actor": "dispatcher", "note": "Local fire crew + BMC team dispatched" },
-            { "status": "On Scene", "timestamp": "2026-04-14T11:25:00", "actor": "system", "note": "Team arrived. Family safe." },
-            { "status": "Resolved", "timestamp": "2026-04-14T12:10:00", "actor": "operator", "note": "Tree removed. Building declared safe." }
+            {
+                "status": "Created",
+                "timestamp": "2026-04-14T11:00:00",
+                "actor": "reporter",
+                "note": "Family called for help after tree damage"
+            },
+            {
+                "status": "Acknowledged",
+                "timestamp": "2026-04-14T11:02:00",
+                "actor": "operator",
+                "note": "Cross-checked with BMC tree department"
+            },
+            {
+                "status": "Dispatched",
+                "timestamp": "2026-04-14T11:05:00",
+                "actor": "dispatcher",
+                "note": "Local fire crew + BMC team dispatched"
+            },
+            {
+                "status": "On Scene",
+                "timestamp": "2026-04-14T11:25:00",
+                "actor": "system",
+                "note": "Team arrived. Family safe."
+            },
+            {
+                "status": "Resolved",
+                "timestamp": "2026-04-14T12:10:00",
+                "actor": "operator",
+                "note": "Tree removed. Building declared safe."
+            }
         ],
         "timestamp": "2026-04-14T11:00:00"
     },
@@ -280,10 +473,17 @@
         "category": "Chemical Hazard",
         "priority": "Critical",
         "urgency": "Life-threatening",
-        "need_type": ["Fire", "Medical", "Police"],
+        "need_type": [
+            "Fire",
+            "Medical",
+            "Police"
+        ],
         "summary": "Toxic chemical spill at Mahul Creek affecting residential areas",
         "severity_score": 9,
-        "coordinates": { "lat": 19.0195, "lng": 72.8930 },
+        "coordinates": {
+            "lat": 19.0195,
+            "lng": 72.893
+        },
         "location": "Mahul Creek Industrial Zone",
         "location_text": "BPCL industrial corridor, Mahul Road, Chembur",
         "venue_name": "Mahul Industrial Zone",
@@ -298,8 +498,18 @@
         "flags": [],
         "status": "Acknowledged",
         "status_timeline": [
-            { "status": "Created", "timestamp": "2026-04-14T13:05:00", "actor": "reporter", "note": "Safety officer at industrial facility" },
-            { "status": "Acknowledged", "timestamp": "2026-04-14T13:06:30", "actor": "operator", "note": "HazMat team notified. Evacuation being planned." }
+            {
+                "status": "Created",
+                "timestamp": "2026-04-14T13:05:00",
+                "actor": "reporter",
+                "note": "Safety officer at industrial facility"
+            },
+            {
+                "status": "Acknowledged",
+                "timestamp": "2026-04-14T13:06:30",
+                "actor": "operator",
+                "note": "HazMat team notified. Evacuation being planned."
+            }
         ],
         "timestamp": "2026-04-14T13:05:00"
     },
@@ -309,10 +519,16 @@
         "category": "Flooding",
         "priority": "High",
         "urgency": "Urgent",
-        "need_type": ["Rescue", "Police"],
+        "need_type": [
+            "Rescue",
+            "Police"
+        ],
         "summary": "Sea wall breach endangering commuters at Worli Sea Face",
         "severity_score": 8,
-        "coordinates": { "lat": 19.0130, "lng": 72.8145 },
+        "coordinates": {
+            "lat": 19.013,
+            "lng": 72.8145
+        },
         "location": "Worli Sea Face Promenade",
         "location_text": "Worli Sea Face Road, near Haji Ali",
         "venue_name": "Worli Sea Face",
@@ -327,9 +543,24 @@
         "flags": [],
         "status": "Dispatched",
         "status_timeline": [
-            { "status": "Created", "timestamp": "2026-04-14T12:40:00", "actor": "reporter", "note": "Pedestrian near Worli Sea Face" },
-            { "status": "Acknowledged", "timestamp": "2026-04-14T12:41:30", "actor": "operator", "note": "Coast Guard liaison activated" },
-            { "status": "Dispatched", "timestamp": "2026-04-14T12:43:00", "actor": "dispatcher", "note": "Police patrol diverted" }
+            {
+                "status": "Created",
+                "timestamp": "2026-04-14T12:40:00",
+                "actor": "reporter",
+                "note": "Pedestrian near Worli Sea Face"
+            },
+            {
+                "status": "Acknowledged",
+                "timestamp": "2026-04-14T12:41:30",
+                "actor": "operator",
+                "note": "Coast Guard liaison activated"
+            },
+            {
+                "status": "Dispatched",
+                "timestamp": "2026-04-14T12:43:00",
+                "actor": "dispatcher",
+                "note": "Police patrol diverted"
+            }
         ],
         "timestamp": "2026-04-14T12:40:00"
     },
@@ -339,10 +570,16 @@
         "category": "Medical Emergency",
         "priority": "Critical",
         "urgency": "Life-threatening",
-        "need_type": ["Rescue", "Medical"],
+        "need_type": [
+            "Rescue",
+            "Medical"
+        ],
         "summary": "Child trapped in manhole near Juhu Beach",
         "severity_score": 9,
-        "coordinates": { "lat": 19.0896, "lng": 72.8262 },
+        "coordinates": {
+            "lat": 19.0896,
+            "lng": 72.8262
+        },
         "location": "Juhu Beach Road",
         "location_text": "Near Juhu Beach entrance, Ville Parle West",
         "venue_name": "Juhu Beach Public Area",
@@ -357,11 +594,36 @@
         "flags": [],
         "status": "Resolved",
         "status_timeline": [
-            { "status": "Created", "timestamp": "2026-04-14T10:30:00", "actor": "reporter", "note": "Bystander reported child in manhole" },
-            { "status": "Acknowledged", "timestamp": "2026-04-14T10:31:00", "actor": "operator", "note": "Verified. Fire crew alerted." },
-            { "status": "Dispatched", "timestamp": "2026-04-14T10:32:00", "actor": "dispatcher", "note": "Ambulance + Fire crew dispatched" },
-            { "status": "On Scene", "timestamp": "2026-04-14T10:42:00", "actor": "system", "note": "Units arrived. Rescue underway." },
-            { "status": "Resolved", "timestamp": "2026-04-14T11:05:00", "actor": "operator", "note": "Child rescued safely. Taken to Nanavati Hospital." }
+            {
+                "status": "Created",
+                "timestamp": "2026-04-14T10:30:00",
+                "actor": "reporter",
+                "note": "Bystander reported child in manhole"
+            },
+            {
+                "status": "Acknowledged",
+                "timestamp": "2026-04-14T10:31:00",
+                "actor": "operator",
+                "note": "Verified. Fire crew alerted."
+            },
+            {
+                "status": "Dispatched",
+                "timestamp": "2026-04-14T10:32:00",
+                "actor": "dispatcher",
+                "note": "Ambulance + Fire crew dispatched"
+            },
+            {
+                "status": "On Scene",
+                "timestamp": "2026-04-14T10:42:00",
+                "actor": "system",
+                "note": "Units arrived. Rescue underway."
+            },
+            {
+                "status": "Resolved",
+                "timestamp": "2026-04-14T11:05:00",
+                "actor": "operator",
+                "note": "Child rescued safely. Taken to Nanavati Hospital."
+            }
         ],
         "timestamp": "2026-04-14T10:30:00"
     },
@@ -371,10 +633,16 @@
         "category": "Infrastructure Damage",
         "priority": "High",
         "urgency": "Urgent",
-        "need_type": ["Police", "Fire"],
+        "need_type": [
+            "Police",
+            "Fire"
+        ],
         "summary": "Live power cables down on wet road at Linking Road",
         "severity_score": 7,
-        "coordinates": { "lat": 19.0621, "lng": 72.8355 },
+        "coordinates": {
+            "lat": 19.0621,
+            "lng": 72.8355
+        },
         "location": "Linking Road, Bandra West",
         "location_text": "Linking Road, near Bandra Talao",
         "venue_name": "Linking Road Commercial Area",
@@ -389,11 +657,36 @@
         "flags": [],
         "status": "Resolved",
         "status_timeline": [
-            { "status": "Created", "timestamp": "2026-04-14T09:15:00", "actor": "reporter", "note": "Shop owner on Linking Road" },
-            { "status": "Acknowledged", "timestamp": "2026-04-14T09:17:00", "actor": "operator", "note": "BEST disconnection request placed" },
-            { "status": "Dispatched", "timestamp": "2026-04-14T09:20:00", "actor": "dispatcher", "note": "Police patrol + BEST team" },
-            { "status": "On Scene", "timestamp": "2026-04-14T09:35:00", "actor": "system", "note": "Area barricaded. Power isolated." },
-            { "status": "Resolved", "timestamp": "2026-04-14T10:45:00", "actor": "operator", "note": "Cables repaired. Power restored." }
+            {
+                "status": "Created",
+                "timestamp": "2026-04-14T09:15:00",
+                "actor": "reporter",
+                "note": "Shop owner on Linking Road"
+            },
+            {
+                "status": "Acknowledged",
+                "timestamp": "2026-04-14T09:17:00",
+                "actor": "operator",
+                "note": "BEST disconnection request placed"
+            },
+            {
+                "status": "Dispatched",
+                "timestamp": "2026-04-14T09:20:00",
+                "actor": "dispatcher",
+                "note": "Police patrol + BEST team"
+            },
+            {
+                "status": "On Scene",
+                "timestamp": "2026-04-14T09:35:00",
+                "actor": "system",
+                "note": "Area barricaded. Power isolated."
+            },
+            {
+                "status": "Resolved",
+                "timestamp": "2026-04-14T10:45:00",
+                "actor": "operator",
+                "note": "Cables repaired. Power restored."
+            }
         ],
         "timestamp": "2026-04-14T09:15:00"
     },
@@ -403,10 +696,15 @@
         "category": "Infrastructure Damage",
         "priority": "High",
         "urgency": "Urgent",
-        "need_type": ["Police"],
+        "need_type": [
+            "Police"
+        ],
         "summary": "Major sinkhole on LBS Marg blocking all traffic",
         "severity_score": 6,
-        "coordinates": { "lat": 19.0710, "lng": 72.8796 },
+        "coordinates": {
+            "lat": 19.071,
+            "lng": 72.8796
+        },
         "location": "LBS Marg, Kurla",
         "location_text": "LBS Marg, near Kurla Bus Depot",
         "venue_name": "LBS Marg Public Road",
@@ -421,8 +719,18 @@
         "flags": [],
         "status": "Acknowledged",
         "status_timeline": [
-            { "status": "Created", "timestamp": "2026-04-14T13:00:00", "actor": "reporter", "note": "BEST bus driver reported road collapse" },
-            { "status": "Acknowledged", "timestamp": "2026-04-14T13:02:00", "actor": "operator", "note": "BMC emergency team alerted" }
+            {
+                "status": "Created",
+                "timestamp": "2026-04-14T13:00:00",
+                "actor": "reporter",
+                "note": "BEST bus driver reported road collapse"
+            },
+            {
+                "status": "Acknowledged",
+                "timestamp": "2026-04-14T13:02:00",
+                "actor": "operator",
+                "note": "BMC emergency team alerted"
+            }
         ],
         "timestamp": "2026-04-14T13:00:00"
     },
@@ -432,10 +740,16 @@
         "category": "Security Threat",
         "priority": "High",
         "urgency": "Urgent",
-        "need_type": ["Police", "Medical"],
+        "need_type": [
+            "Police",
+            "Medical"
+        ],
         "summary": "Armed robbery attempt at ITC Maratha parking lot",
         "severity_score": 7,
-        "coordinates": { "lat": 19.1001, "lng": 72.8692 },
+        "coordinates": {
+            "lat": 19.1001,
+            "lng": 72.8692
+        },
         "location": "ITC Maratha Hotel, Andheri East",
         "location_text": "ITC Maratha, Sahar Road, Andheri East",
         "venue_name": "ITC Maratha Hotel",
@@ -451,9 +765,24 @@
         "flags": [],
         "status": "Dispatched",
         "status_timeline": [
-            { "status": "Created", "timestamp": "2026-04-14T13:08:00", "actor": "panic-button", "note": "Silent alarm from hotel security" },
-            { "status": "Acknowledged", "timestamp": "2026-04-14T13:08:30", "actor": "operator", "note": "Police control room notified immediately" },
-            { "status": "Dispatched", "timestamp": "2026-04-14T13:09:30", "actor": "dispatcher", "note": "Patrol Alpha responding" }
+            {
+                "status": "Created",
+                "timestamp": "2026-04-14T13:08:00",
+                "actor": "panic-button",
+                "note": "Silent alarm from hotel security"
+            },
+            {
+                "status": "Acknowledged",
+                "timestamp": "2026-04-14T13:08:30",
+                "actor": "operator",
+                "note": "Police control room notified immediately"
+            },
+            {
+                "status": "Dispatched",
+                "timestamp": "2026-04-14T13:09:30",
+                "actor": "dispatcher",
+                "note": "Patrol Alpha responding"
+            }
         ],
         "timestamp": "2026-04-14T13:08:00"
     },
@@ -463,10 +792,15 @@
         "category": "Medical Emergency",
         "priority": "High",
         "urgency": "Urgent",
-        "need_type": ["Medical"],
-        "summary": "Mass food poisoning at Goregaon banquet — 20+ affected",
+        "need_type": [
+            "Medical"
+        ],
+        "summary": "Mass food poisoning at Goregaon banquet \u2014 20+ affected",
         "severity_score": 7,
-        "coordinates": { "lat": 19.1651, "lng": 72.8483 },
+        "coordinates": {
+            "lat": 19.1651,
+            "lng": 72.8483
+        },
         "location": "Nesco Convention Center, Goregaon",
         "location_text": "Nesco Exhibition Center, Goregaon East",
         "venue_name": "NESCO Banquet Hall",
@@ -481,10 +815,30 @@
         "flags": [],
         "status": "On Scene",
         "status_timeline": [
-            { "status": "Created", "timestamp": "2026-04-14T11:30:00", "actor": "reporter", "note": "Venue staff reported mass illness" },
-            { "status": "Acknowledged", "timestamp": "2026-04-14T11:32:00", "actor": "operator", "note": "Multiple ambulances requested" },
-            { "status": "Dispatched", "timestamp": "2026-04-14T11:35:00", "actor": "dispatcher", "note": "2 ambulances dispatched" },
-            { "status": "On Scene", "timestamp": "2026-04-14T11:50:00", "actor": "system", "note": "Medical team triaging patients at venue" }
+            {
+                "status": "Created",
+                "timestamp": "2026-04-14T11:30:00",
+                "actor": "reporter",
+                "note": "Venue staff reported mass illness"
+            },
+            {
+                "status": "Acknowledged",
+                "timestamp": "2026-04-14T11:32:00",
+                "actor": "operator",
+                "note": "Multiple ambulances requested"
+            },
+            {
+                "status": "Dispatched",
+                "timestamp": "2026-04-14T11:35:00",
+                "actor": "dispatcher",
+                "note": "2 ambulances dispatched"
+            },
+            {
+                "status": "On Scene",
+                "timestamp": "2026-04-14T11:50:00",
+                "actor": "system",
+                "note": "Medical team triaging patients at venue"
+            }
         ],
         "timestamp": "2026-04-14T11:30:00"
     },
@@ -494,10 +848,15 @@
         "category": "Infrastructure Damage",
         "priority": "Moderate",
         "urgency": "Minor",
-        "need_type": ["Rescue"],
+        "need_type": [
+            "Rescue"
+        ],
         "summary": "Water main burst flooding shops on MG Road",
         "severity_score": 4,
-        "coordinates": { "lat": 18.9380, "lng": 72.8347 },
+        "coordinates": {
+            "lat": 18.938,
+            "lng": 72.8347
+        },
         "location": "MG Road, Fort",
         "location_text": "MG Road, near Kala Ghoda, Fort",
         "venue_name": "MG Road Commercial Block",
@@ -512,11 +871,36 @@
         "flags": [],
         "status": "Resolved",
         "status_timeline": [
-            { "status": "Created", "timestamp": "2026-04-14T08:20:00", "actor": "reporter", "note": "Shop owner called about flooding" },
-            { "status": "Acknowledged", "timestamp": "2026-04-14T08:25:00", "actor": "operator", "note": "BMC water dept contacted" },
-            { "status": "Dispatched", "timestamp": "2026-04-14T08:30:00", "actor": "dispatcher", "note": "BMC maintenance team sent" },
-            { "status": "On Scene", "timestamp": "2026-04-14T08:55:00", "actor": "system", "note": "Team isolating water supply" },
-            { "status": "Resolved", "timestamp": "2026-04-14T10:15:00", "actor": "operator", "note": "Pipe repaired. Water supply restored." }
+            {
+                "status": "Created",
+                "timestamp": "2026-04-14T08:20:00",
+                "actor": "reporter",
+                "note": "Shop owner called about flooding"
+            },
+            {
+                "status": "Acknowledged",
+                "timestamp": "2026-04-14T08:25:00",
+                "actor": "operator",
+                "note": "BMC water dept contacted"
+            },
+            {
+                "status": "Dispatched",
+                "timestamp": "2026-04-14T08:30:00",
+                "actor": "dispatcher",
+                "note": "BMC maintenance team sent"
+            },
+            {
+                "status": "On Scene",
+                "timestamp": "2026-04-14T08:55:00",
+                "actor": "system",
+                "note": "Team isolating water supply"
+            },
+            {
+                "status": "Resolved",
+                "timestamp": "2026-04-14T10:15:00",
+                "actor": "operator",
+                "note": "Pipe repaired. Water supply restored."
+            }
         ],
         "timestamp": "2026-04-14T08:20:00"
     },
@@ -526,10 +910,16 @@
         "category": "Relief & Supplies",
         "priority": "Moderate",
         "urgency": "Urgent",
-        "need_type": ["Supplies", "Medical"],
+        "need_type": [
+            "Supplies",
+            "Medical"
+        ],
         "summary": "Relief camp supply shortage affecting 150 families in Dharavi",
         "severity_score": 5,
-        "coordinates": { "lat": 19.0438, "lng": 72.8534 },
+        "coordinates": {
+            "lat": 19.0438,
+            "lng": 72.8534
+        },
         "location": "Dharavi Relief Camp",
         "location_text": "Community Hall, 90 Feet Road, Dharavi",
         "venue_name": "Dharavi Community Relief Center",
@@ -544,8 +934,18 @@
         "flags": [],
         "status": "Acknowledged",
         "status_timeline": [
-            { "status": "Created", "timestamp": "2026-04-14T10:00:00", "actor": "reporter", "note": "Relief coordinator flagged supply shortage" },
-            { "status": "Acknowledged", "timestamp": "2026-04-14T10:10:00", "actor": "operator", "note": "MCGM disaster cell notified for resupply" }
+            {
+                "status": "Created",
+                "timestamp": "2026-04-14T10:00:00",
+                "actor": "reporter",
+                "note": "Relief coordinator flagged supply shortage"
+            },
+            {
+                "status": "Acknowledged",
+                "timestamp": "2026-04-14T10:10:00",
+                "actor": "operator",
+                "note": "MCGM disaster cell notified for resupply"
+            }
         ],
         "timestamp": "2026-04-14T10:00:00"
     }
