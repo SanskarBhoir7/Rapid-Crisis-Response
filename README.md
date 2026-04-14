@@ -1,244 +1,91 @@
-# Disaster Response Dashboard v2.0
+# Mumbai Crisis Command Center (v3.0) 🚨
 
-AI-assisted emergency response dashboard for Mumbai, with a React frontend and Flask backend.
+A **highly responsive, AI-driven disaster response system** designed for the scale and complexity of Mumbai. This project integrates live fleet tracking, event-driven situational awareness, and deep **Google Gemini AI integration** to assist operators in critical decision-making.
+
+> **Built for the Google AI Hackathon** 🏆
 
 <img width="1914" height="1078" alt="Dashboard screenshot" src="https://github.com/user-attachments/assets/1716ad98-cf97-494d-8604-968b7a0802f9" />
 
-## Overview
+## ✨ Key Features (v3.0 Hackathon Enhancements)
 
-This project combines incident intake, live fleet tracking, map-based dispatch, and AI-assisted situational updates in a single command-center interface.
+- **🤖 AI Crisis Copilot (Gemini-Powered)**: Natural language querying of the incident state, resources, and live conditions. 
+- **🏥 Smart Triage & Risk Matrix**: Intelligent, automatic triage generation for critical incidents, providing actionable priority steps and ETA estimates.
+- **🚨 Escalation Intelligence**: Dynamic banners alert operators about unacknowledged critical incidents, resource exhaustion, and geographic clustering.
+- **⌨️ Command Palette (Ctrl+K)**: Frictionless keyboard-centric navigation and rapid action execution.
+- **📊 Real-time Analytics Dashboard**: 8 KPIs and 5 data visualizations parsing fleet capacity and incident trends.
+- **🎨 Glassmorphic 'Dark Mode' UI**: A sleek, accessible, high-contrast visual design engineered for extended control room operations.
 
-## Key Features
+## 🛠 Tech Stack
 
-- AI-generated situation summaries and severity classification
-- Live incident feed with hospitality metadata
-- Vehicle dispatch and route visualization on Google Maps
-- Incident lifecycle tracking from `Created` to `Resolved`
-- Optional emergency bridge webhook support
+- **Frontend**: React 19, Framer Motion, Chart.js, Lucide Icons, `@vis.gl/react-google-maps`
+- **Backend**: Python, Flask, Server-Sent Events (SSE)
+- **AI & Integrations**: **Google Gemini (1.5 Flash)**, Google Maps Platform
 
-## Tech Stack
+---
 
-- Frontend: React, Framer Motion, Lucide React, `@vis.gl/react-google-maps`
-- Backend: Flask, NumPy, Python dotenv
-- APIs: Google Maps Platform and Gemini
-
-## How To Start
+## 🚀 Quick Start Guide
 
 ### Prerequisites
-
 - Node.js 18+ and npm
 - Python 3.8+
 - Google Maps API key
-- Gemini API key
+- Google Gemini API key
 
-### 1. Configure the backend
+### 1. Configure Environment Variables
 
-Create `backend/.env`:
-
+**Backend (`backend/.env`)**:
 ```env
-GEMINI_API_KEY=your_key_here
-GOOGLE_MAPS_API_KEY=your_key_here
+GEMINI_API_KEY=your_gemini_key_here
+GOOGLE_MAPS_API_KEY=your_maps_key_here
 GEMINI_MODEL=gemini-1.5-flash
 EMERGENCY_WEBHOOK_URL=
 ```
 
-### 2. Start the backend
-
-Open Terminal 1:
-
-```bash
-cd backend
-python -m venv .venv
-.venv\Scripts\activate
-pip install -r requirements.txt
-python app.py
-```
-
-Expected backend URL: `http://127.0.0.1:5001`
-
-### 3. Configure the frontend
-
-Create `disaster-response-dashboard/.env`:
-
+**Frontend (`disaster-response-dashboard/.env`)**:
 ```env
-REACT_APP_GOOGLE_MAPS_API_KEY=your_google_maps_browser_key
+REACT_APP_GOOGLE_MAPS_API_KEY=your_maps_key_here
 ```
 
-### 4. Start the frontend
+### 2. Start the Backend API
 
-Open Terminal 2:
-
-```bash
-cd disaster-response-dashboard
-npm install
-npm start
-```
-
-Expected frontend URL: `http://localhost:3000`
-
-### 5. Start frontend from repo root instead
-
-```bash
-npm install --prefix disaster-response-dashboard
-npm start --prefix disaster-response-dashboard
-```
-
-## End-To-End Check
-
-Use this sequence to verify the current implementation after setup.
-
-### 1. Start both services
-
-In Terminal 1:
-
-```bash
-cd backend
-python app.py
-```
-
-In Terminal 2:
-
-```bash
-cd disaster-response-dashboard
-npm start
-```
-
-Expected:
-
-- Backend runs on `http://127.0.0.1:5001`
-- Frontend runs on `http://localhost:3000`
-
-### 2. Check backend endpoints
-
-Open these URLs in a browser or API client:
-
-- `http://127.0.0.1:5001/get_sos_data`
-- `http://127.0.0.1:5001/get_situation_update`
-- `http://127.0.0.1:5001/bridge_status`
-
-Expected:
-
-- `/get_sos_data` returns a JSON array
-- `/get_situation_update` returns temperature, condition, and insight
-- `/bridge_status` returns mode information
-
-### 3. Test incident reporting
-
-In the dashboard:
-
-1. Click `REPORT INCIDENT`.
-2. Fill in description and hospitality fields.
-3. Use current location or provide a location.
-4. Submit the form.
-
-Expected:
-
-- A new incident appears in the feed
-- The incident opens in the detail panel
-- The status starts at `Created`
-
-### 4. Test lifecycle transitions
-
-From the Incident Command panel, move through:
-
-- `Acknowledged`
-- `Dispatched`
-- `En Route`
-- `On Scene`
-- `Resolved`
-
-Expected:
-
-- Timeline entries are recorded
-- Invalid jumps are rejected by the backend
-
-### 5. Test dispatch and arrival
-
-1. Assign a vehicle to an incident.
-2. Wait for the vehicle marker to reach the destination.
-
-Expected:
-
-- The incident becomes `Dispatched`
-- The incident later updates to `On Scene`
-
-### 6. Test KPI cards
-
-After working through a few incidents, confirm these update:
-
-- Avg Ack
-- Avg Dispatch
-- Avg Resolve
-- Critical Open
-
-### 7. Test bridge mode
-
-Check the header badge:
-
-- `BRIDGE: MOCK` when `EMERGENCY_WEBHOOK_URL` is empty
-- `BRIDGE: LIVE` when the webhook is configured
-
-You can also verify:
-
-- `http://127.0.0.1:5001/bridge_status`
-
-### 8. Quick regression checks
-
-Frontend:
-
-```bash
-cd disaster-response-dashboard
-cmd /c npm test -- --watchAll=false --runInBand
-cmd /c npm run build
-```
-
-Optional backend syntax check:
-
-```bash
-cd backend
-python -m py_compile app.py ai_core.py preprocess_data.py
-```
-
-## Troubleshooting
-
-### `ENOENT package.json`
-
-If you run `npm install` from the repo root, it fails because the frontend `package.json` is inside `disaster-response-dashboard/`.
-
-Use:
-
-```bash
-cd disaster-response-dashboard
-npm install
-npm start
-```
-
-Or:
-
-```bash
-npm install --prefix disaster-response-dashboard
-npm start --prefix disaster-response-dashboard
-```
-
-### Gemini model errors
-
-If the backend logs show Gemini model-not-found errors:
-
-1. Verify `GEMINI_API_KEY`.
-2. Set `GEMINI_MODEL=gemini-1.5-flash` in `backend/.env`.
-3. Restart the backend.
-
-### `pip` dependency conflicts
-
-If Python dependency warnings appear, use a dedicated virtual environment:
-
+Open **Terminal 1**:
 ```bash
 cd backend
 python -m venv .venv
-.venv\Scripts\activate
+.venv\Scripts\activate  # Windows
+source .venv/bin/activate # Mac/Linux
 pip install -r requirements.txt
+python app.py
 ```
+*Backend runs on `http://127.0.0.1:5001`*
 
-### Repeated `/get_sos_data` requests
+### 3. Start the React Frontend
 
-Repeated requests in development can happen because of React development behavior, hot reload, or multiple open tabs. This is normal if responses stay successful and the UI works correctly.
+Open **Terminal 2**:
+```bash
+cd disaster-response-dashboard
+npm install
+npm start
+```
+*Frontend runs on `http://localhost:3000`*
+
+---
+
+## 🧪 Demo Verification Checklist
+
+To verify your system is hackathon-ready, perform the following end-to-end checks:
+
+1. **Boot Sequence**: Confirm the "Disaster OS" boot animation loads smoothly.
+2. **AI Copilot**: Click the "AI" button in the header (or use Ctrl+K). Ask: *"What is the most critical incident right now?"* 
+3. **Smart Triage**: Click any critical incident on the map. Verify the AI Triage section populates with a structured plan.
+4. **Fleet Dispatch**: Assign an Ambulance to a newly reported incident. Watch the animated polyline route update and the capacity gauge adjust.
+5. **Analytics**: Toggle the Analytics view in the header. Verify the severity distribution and resolution rate charts accurately reflect the live feed.
+
+---
+
+## 📁 Architecture Overview
+
+- **`App.js`**: React core, managing SSE subscriptions, Google Maps integration, and state.
+- **`app.py`**: Flask API handling routing, validation, and real-time SSE event broadcasting.
+- **`ai_core.py`**: The intelligence layer. Interfaces with Gemini API using robust local-fallback heuristics.
+- **`processed_data.json`**: Pre-loaded with 18 high-fidelity, diverse Mumbai crisis scenarios for demonstration purposes.
