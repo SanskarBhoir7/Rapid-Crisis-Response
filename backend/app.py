@@ -742,7 +742,7 @@ def add_incident_note():
     return jsonify({"message": "Note added", "note": note})
 
 
-# --- Analytics Endpoint ---
+# --- Analytics Endpoint (Enhanced) ---
 @app.route('/analytics', methods=['GET'])
 def analytics():
     try:
@@ -756,6 +756,9 @@ def analytics():
     by_priority = {"Critical": 0, "High": 0, "Moderate": 0}
     by_status = {}
     resolved_times = []
+    ack_times = []
+    dispatch_times = []
+    venue_counts = {}
     now = datetime.now()
 
     for inc in normalized:
@@ -769,23 +772,39 @@ def analytics():
         st = inc.get("status", "Created")
         by_status[st] = by_status.get(st, 0) + 1
 
-        # Compute resolution time from timeline
+        # Top affected venues
+        venue = inc.get("venue_name", "Unknown")
+        if venue and venue != "Unknown Venue":
+            venue_counts[venue] = venue_counts.get(venue, 0) + 1
+
+        # Compute times from timeline
         timeline = inc.get("status_timeline", [])
         created_ts = None
+        ack_ts = None
+        dispatch_ts = None
         resolved_ts = None
         for entry in timeline:
-            if entry.get("status") == "Created" and not created_ts:
-                try:
-                    created_ts = datetime.fromisoformat(entry["timestamp"])
-                except (ValueError, KeyError):
-                    pass
-            if entry.get("status") == "Resolved" and not resolved_ts:
-                try:
-                    resolved_ts = datetime.fromisoformat(entry["timestamp"])
-                except (ValueError, KeyError):
-                    pass
-        if created_ts and resolved_ts:
-            resolved_times.append((resolved_ts - created_ts).total_seconds() / 60)
+            status_name = entry.get("status")
+            try:
+                ts = datetime.fromisoformat(entry["timestamp"])
+            except (ValueError, KeyError):
+                continue
+            if status_name == "Created" and not created_ts:
+                created_ts = ts
+            elif status_name == "Acknowledged" and not ack_ts:
+                ack_ts = ts
+            elif status_name == "Dispatched" and not dispatch_ts:
+                dispatch_ts = ts
+            elif status_name == "Resolved" and not resolved_ts:
+                resolved_ts = ts
+
+        if created_ts:
+            if ack_ts:
+                ack_times.append((ack_ts - created_ts).total_seconds() / 60)
+            if dispatch_ts:
+                dispatch_times.append((dispatch_ts - created_ts).total_seconds() / 60)
+            if resolved_ts:
+                resolved_times.append((resolved_ts - created_ts).total_seconds() / 60)
 
     # Hourly distribution (last 24h)
     hourly = [0] * 24
@@ -797,7 +816,25 @@ def analytics():
         except (ValueError, TypeError):
             pass
 
+    # Severity distribution
+    severity_dist = [0] * 11  # 0-10
+    for inc in normalized:
+        s = min(10, max(0, inc.get("severity_score", 0)))
+        severity_dist[s] += 1
+
     avg_resolve = sum(resolved_times) / len(resolved_times) if resolved_times else None
+    avg_ack = sum(ack_times) / len(ack_times) if ack_times else None
+    avg_dispatch = sum(dispatch_times) / len(dispatch_times) if dispatch_times else None
+
+    # Top venues sorted
+    top_venues = sorted(venue_counts.items(), key=lambda x: x[1], reverse=True)[:8]
+
+    # Resolution rate
+    resolved_count = by_status.get("Resolved", 0)
+    resolution_rate = round((resolved_count / total) * 100, 1) if total > 0 else 0
+
+    # Affected people total
+    total_affected = sum(inc.get("affected_people_count", 1) for inc in normalized)
 
     return jsonify({
         "total_incidents": total,
@@ -805,9 +842,100 @@ def analytics():
         "by_priority": by_priority,
         "by_status": by_status,
         "avg_resolve_minutes": round(avg_resolve, 1) if avg_resolve else None,
+        "avg_ack_minutes": round(avg_ack, 1) if avg_ack else None,
+        "avg_dispatch_minutes": round(avg_dispatch, 1) if avg_dispatch else None,
         "hourly_distribution": hourly,
-        "resolved_count": by_status.get("Resolved", 0),
-        "active_count": total - by_status.get("Resolved", 0),
+        "severity_distribution": severity_dist,
+        "resolved_count": resolved_count,
+        "active_count": total - resolved_count,
+        "resolution_rate": resolution_rate,
+        "total_affected_people": total_affected,
+        "top_venues": [{"venue": v, "count": c} for v, c in top_venues],
+    })
+
+
+# --- AI Copilot Endpoint ---
+@app.route('/ai_copilot', methods=['POST'])
+def ai_copilot():
+    from ai_core import generate_copilot_response
+    data = request.json or {}
+    query = str(data.get("query", "")).strip()
+    if not query:
+        return jsonify({"error": "Query is required."}), 400
+
+    try:
+        incidents = _load_incidents()
+        normalized = [_normalize_incident(i) for i in incidents]
+        # Build summary for AI
+        summaries = [
+            {
+                "id": i.get("id"),
+                "category": i.get("category"),
+                "priority": i.get("priority"),
+                "severity_score": i.get("severity_score"),
+                "status": i.get("status"),
+                "summary": i.get("summary") or i.get("original_message", "")[:100],
+                "venue_name": i.get("venue_name"),
+                "affected_people_count": i.get("affected_people_count", 1),
+                "coordinates": i.get("coordinates"),
+            }
+            for i in normalized
+        ]
+        result = generate_copilot_response(query, summaries)
+        return jsonify(result)
+    except Exception as e:
+        log.error("AI Copilot error: %s", e)
+        return jsonify({"error": str(e)}), 500
+
+
+# --- AI Triage Endpoint ---
+@app.route('/ai_triage/<incident_id>', methods=['GET'])
+def ai_triage(incident_id):
+    from ai_core import generate_triage_plan
+    try:
+        incidents = _load_incidents()
+        target = None
+        for inc in incidents:
+            if str(inc.get("id")) == str(incident_id):
+                target = _normalize_incident(inc)
+                break
+        if not target:
+            return jsonify({"error": "Incident not found."}), 404
+
+        triage = generate_triage_plan(target)
+        return jsonify(triage)
+    except Exception as e:
+        log.error("Triage error: %s", e)
+        return jsonify({"error": str(e)}), 500
+
+
+# --- Risk Assessment Endpoint ---
+@app.route('/risk_assessment', methods=['GET'])
+def risk_assessment():
+    from ai_core import assess_cluster_risk
+    try:
+        incidents = _load_incidents()
+        normalized = [_normalize_incident(i) for i in incidents]
+        zones = assess_cluster_risk(normalized)
+        return jsonify(zones)
+    except Exception as e:
+        log.error("Risk assessment error: %s", e)
+        return jsonify({"error": str(e)}), 500
+
+
+# --- Health Check ---
+@app.route('/health', methods=['GET'])
+def health():
+    return jsonify({
+        "status": "healthy",
+        "version": "2.0.0",
+        "timestamp": datetime.now().isoformat(),
+        "services": {
+            "gemini": bool(os.getenv("GEMINI_API_KEY")),
+            "google_maps": bool(os.getenv("GOOGLE_MAPS_API_KEY")),
+            "webhook": bool(EMERGENCY_WEBHOOK_URL),
+        },
+        "sse_clients": len(_sse_clients),
     })
 
 

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { APIProvider, Map as GoogleMap, AdvancedMarker, useMap } from '@vis.gl/react-google-maps';
 import { decode } from '@googlemaps/polyline-codec';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertCircle, MapPin, Activity, Shield, Flame, Truck, AlertTriangle, Search, BarChart3, Map as MapIcon } from 'lucide-react';
+import { AlertCircle, MapPin, Activity, Shield, Flame, Truck, AlertTriangle, Search, BarChart3, Map as MapIcon, Bot, Command, Wifi, WifiOff } from 'lucide-react';
 import ReportModal from './ReportModal';
 import VehicleDetailPanel from './VehicleDetailPanel';
 import IncidentDetailPanel from './IncidentDetailPanel';
@@ -10,6 +10,10 @@ import FleetDropdown from './FleetDropdown';
 import IntroOverlay from './IntroOverlay';
 import NotificationToast from './NotificationToast';
 import AnalyticsDashboard from './AnalyticsDashboard';
+import AICopilot from './AICopilot';
+import CommandPalette from './CommandPalette';
+import ResourceCapacityBar from './ResourceCapacityBar';
+import EscalationBanner from './EscalationBanner';
 import './App.css';
 
 // --- CONTROLS COMPONENT ---
@@ -38,6 +42,7 @@ function MapControls({ showTraffic, setShowTraffic }) {
           type="checkbox"
           checked={showTraffic}
           onChange={(e) => setShowTraffic(e.target.checked)}
+          aria-label="Toggle traffic layer"
         />
         <span className="slider round"></span>
         <span className="label-text">Traffic</span>
@@ -56,7 +61,7 @@ function RoutePolyline({ path }) {
     if (!polylineRef.current) {
       polylineRef.current = new window.google.maps.Polyline({
         geodesic: true,
-        strokeColor: '#3b82f6', // Modern blue
+        strokeColor: '#3b82f6',
         strokeOpacity: 0.8,
         strokeWeight: 6,
       });
@@ -82,7 +87,7 @@ function DigitalClock() {
   }, []);
 
   return (
-    <div className="digital-clock">
+    <div className="digital-clock" aria-label="Current time">
       <div className="clock-time">
         {time.toLocaleTimeString('en-US', { hour12: false })}
       </div>
@@ -169,9 +174,19 @@ function calculateResponseKpis(incidents) {
   };
 }
 
+// --- CONNECTION STATUS ---
+function ConnectionStatus({ connected }) {
+  return (
+    <div className={`connection-status ${connected ? 'online' : 'offline'}`} role="status" aria-label={connected ? 'Connected to server' : 'Disconnected from server'}>
+      {connected ? <Wifi size={14} /> : <WifiOff size={14} />}
+      <span>{connected ? 'LIVE' : 'OFFLINE'}</span>
+    </div>
+  );
+}
+
 // --- MAIN APP COMPONENT ---
 function App() {
-  const [showIntro, setShowIntro] = useState(false);
+  const [showIntro, setShowIntro] = useState(true);
   const [sosData, setSosData] = useState([]);
   const [selectedIncident, setSelectedIncident] = useState(null);
   const [selectedVehicle, setSelectedVehicle] = useState(null);
@@ -188,6 +203,11 @@ function App() {
   const [filterCategory, setFilterCategory] = useState('All');
   const [filterPriority, setFilterPriority] = useState('All');
   const [filterStatus, setFilterStatus] = useState('All');
+  const [showCopilot, setShowCopilot] = useState(false);
+  const [showCommandPalette, setShowCommandPalette] = useState(false);
+  const [connected, setConnected] = useState(true);
+  // eslint-disable-next-line no-unused-vars
+  const [dismissedEscalations, setDismissedEscalations] = useState(new Set());
   const alertAudioRef = useRef(null);
   const knownIdsRef = useRef(new Set());
   const [kpis, setKpis] = useState({
@@ -220,6 +240,27 @@ function App() {
   const handleIntroComplete = () => {
     setShowIntro(false);
   };
+
+  // --- KEYBOARD SHORTCUTS ---
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      // Ctrl+K / Cmd+K for command palette
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        setShowCommandPalette(prev => !prev);
+      }
+      // Escape to close panels
+      if (e.key === 'Escape') {
+        if (showCommandPalette) setShowCommandPalette(false);
+        else if (showCopilot) setShowCopilot(false);
+        else if (selectedIncident) setSelectedIncident(null);
+        else if (selectedVehicle) setSelectedVehicle(null);
+        else if (showReportModal) setShowReportModal(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showCommandPalette, showCopilot, selectedIncident, selectedVehicle, showReportModal]);
 
   useEffect(() => {
     const fetchSituation = async () => {
@@ -281,9 +322,11 @@ function App() {
         });
 
         setLoading(false);
+        setConnected(true);
       } catch (err) {
         console.error("Error fetching SOS data:", err);
         setLoading(false);
+        setConnected(false);
       }
     };
 
@@ -309,6 +352,7 @@ function App() {
     let eventSource;
     try {
       eventSource = new EventSource('http://127.0.0.1:5001/stream');
+      eventSource.addEventListener('connected', () => setConnected(true));
       eventSource.addEventListener('new_incident', (e) => {
         try {
           const incident = JSON.parse(e.data);
@@ -316,7 +360,6 @@ function App() {
             if (prev.some(i => i.id === incident.id)) return prev;
             return [incident, ...prev];
           });
-          // Show toast for critical incidents
           if ((incident.severity_score || 0) >= 8) {
             setNotifications(prev => [incident, ...prev].slice(0, 5));
             try { if (alertAudioRef.current) alertAudioRef.current.play().catch(() => {}); } catch (_) {}
@@ -330,9 +373,10 @@ function App() {
           setSelectedIncident(prev => prev && prev.id === updated.id ? updated : prev);
         } catch (_) {}
       });
+      eventSource.onerror = () => setConnected(false);
     } catch (_) {}
 
-    const sosInterval = setInterval(fetchSos, 8000);  // SSE supplements, poll is fallback
+    const sosInterval = setInterval(fetchSos, 8000);
     const situationInterval = setInterval(fetchSituation, 60000);
     const bridgeStatusInterval = setInterval(fetchBridgeStatus, 60000);
     const bridgeEventsInterval = setInterval(fetchBridgeEvents, 7000);
@@ -346,7 +390,6 @@ function App() {
     };
   }, []);
 
-  // Helper: Fetch Route in Background
   const fetchRouteForVehicle = useCallback(async (vehicle, target) => {
     try {
       const res = await fetch(`http://127.0.0.1:5001/get_route?lat=${target.coordinates.lat}&lng=${target.coordinates.lng}&start_lat=${vehicle.lat}&start_lng=${vehicle.lng}`);
@@ -355,8 +398,6 @@ function App() {
         if (data.overview_polyline) {
           const decoded = decode(data.overview_polyline);
           const newPath = decoded.map(([lat, lng]) => ({ lat, lng }));
-
-          // Update vehicle with path once loaded
           setResources(prev => prev.map(r => {
             if (r.id === vehicle.id) {
               return { ...r, path: newPath };
@@ -367,7 +408,6 @@ function App() {
       }
     } catch (err) {
       console.error("Routing Error:", err);
-      // Fallback path (straight line) already handled if path is empty
       setResources(prev => prev.map(r => {
         if (r.id === vehicle.id) {
           return { ...r, path: [{ lat: vehicle.lat, lng: vehicle.lng }, target.coordinates] };
@@ -402,9 +442,7 @@ function App() {
         if (errPayload?.error) {
           errorMessage = errPayload.error;
         }
-      } catch (_) {
-        // Keep fallback error message.
-      }
+      } catch (_) {}
       throw new Error(errorMessage);
     }
 
@@ -419,14 +457,13 @@ function App() {
     const vehicle = resources.find(r => r.id === vehicleId);
     if (!vehicle) return;
 
-    // 1. Optimistic Update (Instant Feedback)
     setResources(prev => prev.map(res => {
       if (res.id === vehicleId) {
         return {
           ...res,
           status: incidentId ? 'DISPATCHED' : 'IDLE',
           target_incident_id: incidentId,
-          path: [], // Reset path until loaded
+          path: [],
           pathIndex: 0
         };
       }
@@ -451,7 +488,6 @@ function App() {
         console.error('Failed to persist dispatch status:', err);
       }
 
-      // 2. Trigger Route Fetch
       const target = sosData.find(i => i.id === incidentId);
       if (target && target.coordinates) {
         fetchRouteForVehicle(vehicle, target);
@@ -508,7 +544,7 @@ function App() {
     });
   }, [assignVehicle, resources, sosData]);
 
-  // SIMULATE MOVEMENT (Following Path)
+  // SIMULATE MOVEMENT
   useEffect(() => {
     const moveInterval = setInterval(() => {
       setResources(prev => prev.map(res => {
@@ -519,8 +555,7 @@ function App() {
           const dx = targetNode.lat - res.lat;
           const dy = targetNode.lng - res.lng;
           const dist = Math.sqrt(dx * dx + dy * dy);
-
-          const speed = 0.0001; // Realistic speed
+          const speed = 0.0001;
 
           if (dist < speed) {
             const nextIndex = res.pathIndex + 1;
@@ -554,9 +589,7 @@ function App() {
         if (errPayload?.error) {
           errorMessage = errPayload.error;
         }
-      } catch (_) {
-        // Keep default error message when response is non-JSON.
-      }
+      } catch (_) {}
       throw new Error(errorMessage);
     }
 
@@ -608,9 +641,7 @@ function App() {
           if (errPayload?.error) {
             errorMessage = errPayload.error;
           }
-        } catch (_) {
-          // Keep default message.
-        }
+        } catch (_) {}
         throw new Error(errorMessage);
       }
 
@@ -631,7 +662,6 @@ function App() {
 
   useEffect(() => {
     setKpis(calculateResponseKpis(sosData));
-    // Track known IDs for toast dedup
     sosData.forEach(i => knownIdsRef.current.add(i.id));
   }, [sosData]);
 
@@ -644,7 +674,6 @@ function App() {
     setNotifications(prev => prev.filter(n => n.id !== incident.id));
   }, []);
 
-  // Auto-dismiss toasts after 8 seconds
   useEffect(() => {
     if (notifications.length === 0) return;
     const timer = setTimeout(() => {
@@ -653,10 +682,8 @@ function App() {
     return () => clearTimeout(timer);
   }, [notifications]);
 
-  // Derive unique categories for filter
   const allCategories = [...new Set(sosData.map(i => i.category).filter(Boolean))];
 
-  // Apply filters
   const filteredSosData = sosData.filter(item => {
     if (filterCategory !== 'All' && item.category !== filterCategory) return false;
     if (filterPriority !== 'All' && item.priority !== filterPriority) return false;
@@ -671,15 +698,11 @@ function App() {
 
   useEffect(() => {
     const arrivals = resources.filter(res => res.justArrived && res.target_incident_id);
-    if (arrivals.length === 0) {
-      return;
-    }
+    if (arrivals.length === 0) return;
 
     const arrivedResourceIds = new Set(arrivals.map(res => res.id));
     setResources(prev => prev.map(res => {
-      if (!arrivedResourceIds.has(res.id)) {
-        return res;
-      }
+      if (!arrivedResourceIds.has(res.id)) return res;
       return { ...res, justArrived: false };
     }));
 
@@ -693,6 +716,17 @@ function App() {
     });
   }, [resources, updateIncidentStatus]);
 
+  // Command palette action handler
+  const handleCommandAction = useCallback((action) => {
+    if (action === 'report') setShowReportModal(true);
+    else if (action === 'analytics') setShowAnalytics(prev => !prev);
+    else if (action === 'copilot') setShowCopilot(true);
+  }, []);
+
+  // Incident count for sidebar
+  const activeCount = sosData.filter(i => i.status !== 'Resolved').length;
+  const criticalCount = sosData.filter(i => i.priority === 'Critical' && i.status !== 'Resolved').length;
+
   return (
     <APIProvider apiKey={process.env.REACT_APP_GOOGLE_MAPS_API_KEY}>
       <AnimatePresence>
@@ -700,51 +734,76 @@ function App() {
       </AnimatePresence>
 
       <div className="app-container">
+        {/* ESCALATION BANNERS */}
+        <EscalationBanner
+          incidents={sosData}
+          resources={resources}
+          onDismiss={(id) => setDismissedEscalations(prev => new Set([...prev, id]))}
+        />
+
         {/* HEADER */}
-        <header className="app-header glass">
+        <header className="app-header glass" role="banner">
           <div className="logo-area">
-            <Activity className="pulse-icon" />
+            <Activity className="pulse-icon" aria-hidden="true" />
             <h1>MUMBAI DISASTER RESPONSE</h1>
+            <span className="version-badge">v3.0</span>
           </div>
 
           <div className="header-stats">
             <DigitalClock />
-            <div className="stat-item pulse-stat">
-              <span className="stat-label">LIVE STATUS</span>
-              <span className="stat-value text-green">ONLINE</span>
-            </div>
+            <ConnectionStatus connected={connected} />
+            <ResourceCapacityBar resources={resources} />
           </div>
 
-            <div className="header-actions">
+          <div className="header-actions">
+            <button
+              className="cmd-trigger-btn"
+              onClick={() => setShowCommandPalette(true)}
+              title="Command Palette (Ctrl+K)"
+              aria-label="Open command palette"
+            >
+              <Command size={14} />
+              <span className="cmd-key-hint">Ctrl+K</span>
+            </button>
+            <button
+              className={`copilot-toggle-btn ${showCopilot ? 'active' : ''}`}
+              onClick={() => setShowCopilot(!showCopilot)}
+              title="AI Copilot"
+              aria-label="Toggle AI Copilot"
+            >
+              <Bot size={16} />
+              AI
+            </button>
             <button
               className={`analytics-toggle-btn ${showAnalytics ? 'active' : ''}`}
               onClick={() => setShowAnalytics(!showAnalytics)}
               title={showAnalytics ? 'Show Map' : 'Show Analytics'}
+              aria-label={showAnalytics ? 'Switch to map view' : 'Switch to analytics view'}
             >
               {showAnalytics ? <><MapIcon size={16} /> MAP</> : <><BarChart3 size={16} /> ANALYTICS</>}
             </button>
             <div className={`bridge-badge ${bridgeMode.mode === 'live' ? 'live' : 'mock'}`}>
               BRIDGE: {bridgeMode.mode === 'live' ? 'LIVE' : bridgeMode.mode === 'mock' ? 'MOCK' : 'UNKNOWN'}
             </div>
-            <button className="report-btn-header" onClick={() => setShowReportModal(true)}>
-              <AlertTriangle size={18} />
+            <button className="report-btn-header" onClick={() => setShowReportModal(true)} aria-label="Report new incident">
+              <AlertTriangle size={18} aria-hidden="true" />
               REPORT INCIDENT
             </button>
-            <button className="panic-btn-header" onClick={handlePanicAlert} disabled={panicSubmitting}>
-              <AlertCircle size={18} />
+            <button className="panic-btn-header" onClick={handlePanicAlert} disabled={panicSubmitting} aria-label="Trigger panic alert">
+              <AlertCircle size={18} aria-hidden="true" />
               {panicSubmitting ? 'TRIGGERING...' : 'PANIC BUTTON'}
             </button>
             <FleetDropdown resources={resources} onSelect={(res) => { setSelectedVehicle(res); setSelectedIncident(null); }} />
           </div>
         </header>
 
-        <div className="main-content">
+        <div className="main-content" role="main">
           {/* SIDEBAR */}
-          <div className="sidebar left-sidebar glass">
+          <div className="sidebar left-sidebar glass" role="complementary" aria-label="Incident sidebar">
             {/* --- WEATHER CARD --- */}
             <div className="weather-card">
               <div className="weather-header">
-                <h3><span className="live-dot"></span> MUMBAI LIVE</h3>
+                <h3><span className="live-dot" aria-hidden="true"></span> MUMBAI LIVE</h3>
                 <span>{situation.temp}</span>
               </div>
               <div className="weather-details">
@@ -801,30 +860,38 @@ function App() {
               </div>
             </div>
 
-            <h2>Live SOS Feed</h2>
+            {/* FEED HEADER WITH COUNTS */}
+            <div className="feed-header">
+              <h2>Live SOS Feed</h2>
+              <div className="feed-counts">
+                <span className="feed-count-badge active">{activeCount} active</span>
+                {criticalCount > 0 && <span className="feed-count-badge critical">{criticalCount} critical</span>}
+              </div>
+            </div>
 
             {/* --- FILTER BAR --- */}
             <div className="filter-bar">
               <div className="filter-search">
-                <Search size={14} />
+                <Search size={14} aria-hidden="true" />
                 <input
                   type="text"
                   placeholder="Search incidents..."
                   value={filterText}
                   onChange={(e) => setFilterText(e.target.value)}
+                  aria-label="Search incidents"
                 />
               </div>
-              <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)}>
+              <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)} aria-label="Filter by category">
                 <option value="All">All Categories</option>
                 {allCategories.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
-              <select value={filterPriority} onChange={(e) => setFilterPriority(e.target.value)}>
+              <select value={filterPriority} onChange={(e) => setFilterPriority(e.target.value)} aria-label="Filter by priority">
                 <option value="All">All Priorities</option>
                 <option value="Critical">Critical</option>
                 <option value="High">High</option>
                 <option value="Moderate">Moderate</option>
               </select>
-              <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
+              <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)} aria-label="Filter by status">
                 <option value="All">All Statuses</option>
                 <option value="Created">Created</option>
                 <option value="Acknowledged">Acknowledged</option>
@@ -835,16 +902,20 @@ function App() {
               </select>
             </div>
 
-            <div className="sos-feed">
+            <div className="sos-feed" role="feed" aria-label="Incident feed">
               {loading ? <p>Loading data...</p> : filteredSosData.length === 0 ? (
                 <p className="no-incidents">No incidents match your filters.</p>
               ) : filteredSosData.map(item => (
                 <motion.div
                   key={item.id}
-                  className={`sos-card priority-${item.priority.toLowerCase()}`}
+                  className={`sos-card priority-${item.priority.toLowerCase()} ${selectedIncident?.id === item.id ? 'active' : ''}`}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   onClick={() => setSelectedIncident(item)}
+                  role="article"
+                  aria-label={`${item.priority} incident: ${item.category}`}
+                  tabIndex={0}
+                  onKeyDown={(e) => { if (e.key === 'Enter') setSelectedIncident(item); }}
                 >
                   <div className="sos-header">
                     <span className={`category-badge ${item.urgency ? item.urgency.toLowerCase() : 'minor'}`}>{item.category}</span>
@@ -859,7 +930,7 @@ function App() {
                     {item.panic_code && <span className="incident-source panic-code">{item.panic_code}</span>}
                   </div>
                   <div className="sos-meta">
-                    <span><MapPin size={12} /> {item.location_text || item.location}</span>
+                    <span><MapPin size={12} aria-hidden="true" /> {item.location_text || item.location}</span>
                     <div className="severity-bar">
                       <div className="fill" style={{
                         width: `${item.severity_score * 10}%`,
@@ -867,7 +938,7 @@ function App() {
                       }}></div>
                     </div>
                   </div>
-                  {item.assigned_vehicle && <div className="assigned-badge"><Truck size={12} /> Unit Dispatched</div>}
+                  {item.assigned_vehicle && <div className="assigned-badge"><Truck size={12} aria-hidden="true" /> Unit Dispatched</div>}
                 </motion.div>
               ))}
             </div>
@@ -896,7 +967,7 @@ function App() {
                   position={incident.coordinates}
                   onClick={() => setSelectedIncident(incident)}
                 >
-                  <div className={`custom-marker ${incident.priority.toLowerCase()} ${selectedIncident?.id === incident.id ? 'selected' : ''}`}>
+                  <div className={`custom-marker ${incident.priority.toLowerCase()} ${selectedIncident?.id === incident.id ? 'selected' : ''} ${incident.severity_score >= 8 ? 'pulse-critical' : ''}`}>
                     <AlertCircle size={20} color="white" />
                   </div>
                 </AdvancedMarker>
@@ -961,6 +1032,27 @@ function App() {
           onAssign={assignVehicle}
           onStatusChange={handleIncidentStatusChange}
           vehicles={resources}
+        />
+
+        {/* AI COPILOT */}
+        <AnimatePresence>
+          {showCopilot && (
+            <AICopilot
+              isOpen={showCopilot}
+              onClose={() => setShowCopilot(false)}
+            />
+          )}
+        </AnimatePresence>
+
+        {/* COMMAND PALETTE */}
+        <CommandPalette
+          isOpen={showCommandPalette}
+          onClose={() => setShowCommandPalette(false)}
+          incidents={sosData}
+          vehicles={resources}
+          onSelectIncident={(inc) => { setSelectedIncident(inc); setSelectedVehicle(null); }}
+          onSelectVehicle={(v) => { setSelectedVehicle(v); setSelectedIncident(null); }}
+          onAction={handleCommandAction}
         />
       </div>
     </APIProvider>

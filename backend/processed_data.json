@@ -1,2214 +1,552 @@
 [
     {
-        "id": 1774784264740,
-        "original_message": "Silent panic button triggered. Dispatch nearest responders immediately.",
-        "category": "Panic Alert",
+        "id": 1001,
+        "original_message": "Major fire broke out on the 12th floor of Antilia Tower. Thick black smoke visible from Marine Drive. Multiple residents trapped. Fire brigade en route but access roads congested.",
+        "category": "Fire",
         "priority": "Critical",
         "urgency": "Life-threatening",
-        "need_type": [
-            "Police",
-            "Medical"
-        ],
-        "summary": "Panic button activated at Hospitality Venue",
+        "need_type": ["Fire", "Rescue", "Medical"],
+        "summary": "High-rise fire at Antilia Tower with trapped residents",
         "severity_score": 10,
-        "coordinates": {
-            "lat": 19.20991986560782,
-            "lng": 72.87748481001832
-        },
-        "location": "Panic Button Trigger",
-        "location_text": "Hospitality Venue Unknown Panic Trigger Zone",
-        "venue_name": "Hospitality Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Panic Trigger Zone",
+        "coordinates": { "lat": 18.9716, "lng": 72.8131 },
+        "location": "Antilia Tower, Altamount Road",
+        "location_text": "Antilia Tower, Altamount Road, Cumballa Hill",
+        "venue_name": "Antilia Tower Residences",
+        "floor": "12th Floor",
+        "room_or_zone": "West Wing",
+        "reporter_type": "Security",
+        "source": "panic_button",
+        "channel": "silent_alarm",
+        "panic_code": "FIRE-ALPHA-01",
+        "affected_people_count": 35,
+        "authenticity_score": 10,
+        "reasoning": "Verified fire alarm trigger from building security system.",
+        "flags": [],
+        "status": "Dispatched",
+        "assigned_vehicle": "fire-1",
+        "status_timeline": [
+            { "status": "Created", "timestamp": "2026-04-14T13:02:00", "actor": "security-system", "note": "Auto-triggered by smoke detectors on Floor 12" },
+            { "status": "Acknowledged", "timestamp": "2026-04-14T13:02:45", "actor": "operator", "note": "Confirmed via CCTV feed" },
+            { "status": "Dispatched", "timestamp": "2026-04-14T13:03:30", "actor": "dispatcher", "note": "Fire Engine 4 dispatched" }
+        ],
+        "timestamp": "2026-04-14T13:02:00"
+    },
+    {
+        "id": 1002,
+        "original_message": "Severe waterlogging at Hindmata Junction. Water level 4 feet. Multiple vehicles stranded. Elderly couple trapped in auto-rickshaw. Need immediate rescue boat.",
+        "category": "Flooding",
+        "priority": "Critical",
+        "urgency": "Life-threatening",
+        "need_type": ["Rescue", "Police"],
+        "summary": "Critical flooding with stranded civilians at Hindmata Junction",
+        "severity_score": 9,
+        "coordinates": { "lat": 19.0084, "lng": 72.8520 },
+        "location": "Hindmata Junction, Parel",
+        "location_text": "Hindmata Junction, near Parel Station",
+        "venue_name": "Hindmata Junction",
+        "floor": "Ground Level",
+        "room_or_zone": "Main Intersection",
+        "reporter_type": "Staff",
+        "source": "manual_report",
+        "channel": "dashboard_form",
+        "affected_people_count": 25,
+        "authenticity_score": 9,
+        "reasoning": "Known flood-prone area. Report consistent with weather advisory.",
+        "flags": [],
+        "status": "En Route",
+        "assigned_vehicle": "pol-1",
+        "status_timeline": [
+            { "status": "Created", "timestamp": "2026-04-14T12:45:00", "actor": "reporter", "note": "Citizen report via dashboard" },
+            { "status": "Acknowledged", "timestamp": "2026-04-14T12:46:10", "actor": "operator", "note": "Cross-verified with BMC flood sensors" },
+            { "status": "Dispatched", "timestamp": "2026-04-14T12:47:00", "actor": "dispatcher", "note": "Patrol Alpha dispatched" },
+            { "status": "En Route", "timestamp": "2026-04-14T12:48:30", "actor": "system", "note": "Unit navigating alternate route due to road closure" }
+        ],
+        "timestamp": "2026-04-14T12:45:00"
+    },
+    {
+        "id": 1003,
+        "original_message": "Guest collapsed in hotel lobby. Suspected cardiac arrest. CPR in progress by trained staff. Need ambulance with ALS equipment immediately.",
+        "category": "Medical Emergency",
+        "priority": "Critical",
+        "urgency": "Life-threatening",
+        "need_type": ["Medical"],
+        "summary": "Cardiac arrest at Taj Palace Hotel — CPR in progress",
+        "severity_score": 10,
+        "coordinates": { "lat": 18.9220, "lng": 72.8332 },
+        "location": "Taj Palace Hotel, Colaba",
+        "location_text": "Taj Mahal Palace Hotel, Apollo Bunder, Colaba",
+        "venue_name": "Taj Mahal Palace Hotel",
+        "floor": "Ground Floor",
+        "room_or_zone": "Main Lobby",
         "reporter_type": "Staff",
         "source": "panic_button",
         "channel": "silent_alarm",
-        "panic_code": "PANIC-01",
+        "panic_code": "MED-01",
         "affected_people_count": 1,
         "authenticity_score": 10,
-        "reasoning": "Direct panic trigger from hospitality staff channel.",
+        "reasoning": "Staff-verified medical emergency. Panic button triggered from lobby desk.",
         "flags": [],
-        "status": "Dispatched",
+        "status": "On Scene",
+        "assigned_vehicle": "amb-1",
         "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-03-29T17:07:44.740887",
-                "actor": "panic-button",
-                "note": "Panic alert triggered via PANIC-01"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-29T17:07:44.934017",
-                "actor": "dispatcher",
-                "note": "Unit amb-2 dispatched"
-            }
+            { "status": "Created", "timestamp": "2026-04-14T12:30:00", "actor": "panic-button", "note": "Panic alert triggered at lobby reception" },
+            { "status": "Acknowledged", "timestamp": "2026-04-14T12:30:20", "actor": "operator", "note": "Confirmed. Guest unresponsive." },
+            { "status": "Dispatched", "timestamp": "2026-04-14T12:30:45", "actor": "dispatcher", "note": "Ambulance 1 dispatched" },
+            { "status": "En Route", "timestamp": "2026-04-14T12:31:00", "actor": "system", "note": "ETA 8 minutes" },
+            { "status": "On Scene", "timestamp": "2026-04-14T12:38:00", "actor": "system", "note": "Ambulance 1 arrived. Paramedics taking over CPR." }
         ],
-        "timestamp": "2026-03-29T17:07:44.740887",
-        "assigned_vehicle": "amb-2"
+        "timestamp": "2026-04-14T12:30:00"
     },
     {
-        "id": 1774453083635,
-        "original_message": "Silent panic button triggered. Dispatch nearest responders immediately.",
-        "category": "Panic Alert",
+        "id": 1004,
+        "original_message": "Partial building collapse at construction site near Lokhandwala Complex. Workers heard screaming from under rubble. At least 5 people trapped.",
+        "category": "Structure Collapse",
         "priority": "Critical",
         "urgency": "Life-threatening",
-        "need_type": [
-            "Police",
-            "Medical"
-        ],
-        "summary": "Panic button activated at Hospitality Venue",
+        "need_type": ["Fire", "Medical", "Police"],
+        "summary": "Building collapse with trapped workers at Lokhandwala",
         "severity_score": 10,
-        "coordinates": {
-            "lat": 19.209979295242157,
-            "lng": 72.8774512602263
-        },
-        "location": "Panic Button Trigger",
-        "location_text": "Hospitality Venue Unknown Panic Trigger Zone",
-        "venue_name": "Hospitality Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Panic Trigger Zone",
-        "reporter_type": "Staff",
-        "source": "panic_button",
-        "channel": "silent_alarm",
-        "panic_code": "PANIC-01",
-        "affected_people_count": 1,
+        "coordinates": { "lat": 19.1449, "lng": 72.8340 },
+        "location": "Lokhandwala Complex, Andheri West",
+        "location_text": "Construction site, Lokhandwala Complex, Andheri W",
+        "venue_name": "Lokhandwala Construction Site",
+        "floor": "Ground + Basement",
+        "room_or_zone": "East Section",
+        "reporter_type": "Security",
+        "source": "manual_report",
+        "channel": "dashboard_form",
+        "affected_people_count": 12,
         "authenticity_score": 10,
-        "reasoning": "Direct panic trigger from hospitality staff channel.",
+        "reasoning": "Multiple corroborating reports received. NDRF alerted.",
+        "flags": [],
+        "status": "Acknowledged",
+        "status_timeline": [
+            { "status": "Created", "timestamp": "2026-04-14T13:15:00", "actor": "reporter", "note": "Nearby security guard reported via dashboard" },
+            { "status": "Acknowledged", "timestamp": "2026-04-14T13:16:00", "actor": "operator", "note": "Verified via satellite imagery. NDRF notified." }
+        ],
+        "timestamp": "2026-04-14T13:15:00"
+    },
+    {
+        "id": 1005,
+        "original_message": "Stampede-like situation at Dadar railway station. Rush-hour crowd surge caused multiple injuries. Station PA system malfunction making announcements impossible.",
+        "category": "Crowd Emergency",
+        "priority": "Critical",
+        "urgency": "Life-threatening",
+        "need_type": ["Police", "Medical"],
+        "summary": "Crowd surge with injuries at Dadar station",
+        "severity_score": 9,
+        "coordinates": { "lat": 19.0186, "lng": 72.8428 },
+        "location": "Dadar Railway Station",
+        "location_text": "Dadar Railway Station, Platform 4-5",
+        "venue_name": "Dadar Railway Station",
+        "floor": "Platform Level",
+        "room_or_zone": "Platform 4 Bridge",
+        "reporter_type": "Staff",
+        "source": "manual_report",
+        "channel": "dashboard_form",
+        "affected_people_count": 40,
+        "authenticity_score": 9,
+        "reasoning": "Railway police confirmed via wireless communication.",
+        "flags": [],
+        "status": "Created",
+        "status_timeline": [
+            { "status": "Created", "timestamp": "2026-04-14T13:25:00", "actor": "reporter", "note": "Railway staff reported crowd emergency" }
+        ],
+        "timestamp": "2026-04-14T13:25:00"
+    },
+    {
+        "id": 1006,
+        "original_message": "Gas leak detected in kitchen area of The Oberoi Hotel. Guests evacuated from restaurant floor. Strong smell of LPG. Maintenance team attempting to isolate supply.",
+        "category": "Gas Leak",
+        "priority": "High",
+        "urgency": "Urgent",
+        "need_type": ["Fire", "Police"],
+        "summary": "Kitchen gas leak at The Oberoi — partial evacuation",
+        "severity_score": 8,
+        "coordinates": { "lat": 18.9268, "lng": 72.8310 },
+        "location": "The Oberoi Hotel, Marine Drive",
+        "location_text": "The Oberoi Hotel, Nariman Point",
+        "venue_name": "The Oberoi Mumbai",
+        "floor": "1st Floor",
+        "room_or_zone": "Kitchen / Ziya Restaurant",
+        "reporter_type": "Staff",
+        "source": "manual_report",
+        "channel": "dashboard_form",
+        "affected_people_count": 60,
+        "authenticity_score": 9,
+        "reasoning": "Hotel management confirmed. Gas company notified.",
+        "flags": [],
+        "status": "Acknowledged",
+        "status_timeline": [
+            { "status": "Created", "timestamp": "2026-04-14T13:10:00", "actor": "reporter", "note": "Hotel duty manager reported" },
+            { "status": "Acknowledged", "timestamp": "2026-04-14T13:11:30", "actor": "operator", "note": "Confirmed. Fire department pre-alerted." }
+        ],
+        "timestamp": "2026-04-14T13:10:00"
+    },
+    {
+        "id": 1007,
+        "original_message": "Multiple vehicle pile-up on Western Express Highway near Vile Parle flyover. At least 6 vehicles involved. Fuel spill on road creating fire hazard. Several injuries reported.",
+        "category": "Traffic Accident",
+        "priority": "High",
+        "urgency": "Urgent",
+        "need_type": ["Police", "Medical", "Fire"],
+        "summary": "Multi-vehicle accident with fuel spill on WEH",
+        "severity_score": 8,
+        "coordinates": { "lat": 19.0990, "lng": 72.8489 },
+        "location": "Western Express Highway, Vile Parle",
+        "location_text": "WEH Flyover, near Vile Parle East",
+        "venue_name": "Western Express Highway",
+        "floor": "Road Level",
+        "room_or_zone": "Flyover Section",
+        "reporter_type": "Guest",
+        "source": "manual_report",
+        "channel": "dashboard_form",
+        "affected_people_count": 15,
+        "authenticity_score": 8,
+        "reasoning": "Multiple independent reports from motorists.",
+        "flags": [],
+        "status": "Dispatched",
+        "assigned_vehicle": "amb-2",
+        "status_timeline": [
+            { "status": "Created", "timestamp": "2026-04-14T12:55:00", "actor": "reporter", "note": "Motorist report on WEH pileup" },
+            { "status": "Acknowledged", "timestamp": "2026-04-14T12:56:00", "actor": "operator", "note": "Traffic police confirmed via radio" },
+            { "status": "Dispatched", "timestamp": "2026-04-14T12:57:00", "actor": "dispatcher", "note": "Ambulance 2 dispatched" }
+        ],
+        "timestamp": "2026-04-14T12:55:00"
+    },
+    {
+        "id": 1008,
+        "original_message": "Electrical transformer explosion near Bandra Reclamation. Power outage affecting 5 blocks. Sparks visible. Residents reporting smell of burning plastic. Risk of further fires.",
+        "category": "Fire",
+        "priority": "High",
+        "urgency": "Urgent",
+        "need_type": ["Fire", "Police"],
+        "summary": "Transformer explosion at Bandra causing outage and fire risk",
+        "severity_score": 7,
+        "coordinates": { "lat": 19.0440, "lng": 72.8210 },
+        "location": "Bandra Reclamation, Bandra West",
+        "location_text": "Near Bandra Reclamation, next to SV Road",
+        "venue_name": "BEST Transformer Station",
+        "floor": "Ground Level",
+        "room_or_zone": "Sub-station 14B",
+        "reporter_type": "Guest",
+        "source": "manual_report",
+        "channel": "dashboard_form",
+        "affected_people_count": 200,
+        "authenticity_score": 8,
+        "reasoning": "BEST control room has confirmed outage in sector.",
+        "flags": [],
+        "status": "Created",
+        "status_timeline": [
+            { "status": "Created", "timestamp": "2026-04-14T13:20:00", "actor": "reporter", "note": "Resident near transformer reported explosion" }
+        ],
+        "timestamp": "2026-04-14T13:20:00"
+    },
+    {
+        "id": 1009,
+        "original_message": "Tree fell on a residential building in Powai during strong winds. One wall partially damaged. Family of 4 inside asking for help. No injuries yet but structure is unstable.",
+        "category": "Structure Collapse",
+        "priority": "High",
+        "urgency": "Urgent",
+        "need_type": ["Rescue", "Police"],
+        "summary": "Tree fall on building with family inside at Powai",
+        "severity_score": 7,
+        "coordinates": { "lat": 19.1176, "lng": 72.9060 },
+        "location": "Hiranandani Gardens, Powai",
+        "location_text": "Hiranandani Gardens, Building D5, Powai",
+        "venue_name": "Hiranandani Gardens",
+        "floor": "2nd Floor",
+        "room_or_zone": "Flat D-502",
+        "reporter_type": "Guest",
+        "source": "manual_report",
+        "channel": "dashboard_form",
+        "affected_people_count": 4,
+        "authenticity_score": 8,
+        "reasoning": "Photo evidence shared. Consistent with IMD wind warning.",
         "flags": [],
         "status": "Resolved",
         "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-03-25T21:08:03.635569",
-                "actor": "panic-button",
-                "note": "Panic alert triggered via PANIC-01"
-            },
-            {
-                "status": "Acknowledged",
-                "timestamp": "2026-03-25T21:08:16.640904",
-                "actor": "operator",
-                "note": "Manually set to Acknowledged"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-25T21:08:42.894414",
-                "actor": "dispatcher",
-                "note": "Unit amb-2 dispatched"
-            },
-            {
-                "status": "En Route",
-                "timestamp": "2026-03-25T21:09:10.366227",
-                "actor": "operator",
-                "note": "Manually set to En Route"
-            },
-            {
-                "status": "On Scene",
-                "timestamp": "2026-03-25T21:09:12.656681",
-                "actor": "operator",
-                "note": "Manually set to On Scene"
-            },
-            {
-                "status": "Resolved",
-                "timestamp": "2026-03-25T21:09:15.866179",
-                "actor": "operator",
-                "note": "Manually set to Resolved"
-            }
+            { "status": "Created", "timestamp": "2026-04-14T11:00:00", "actor": "reporter", "note": "Family called for help after tree damage" },
+            { "status": "Acknowledged", "timestamp": "2026-04-14T11:02:00", "actor": "operator", "note": "Cross-checked with BMC tree department" },
+            { "status": "Dispatched", "timestamp": "2026-04-14T11:05:00", "actor": "dispatcher", "note": "Local fire crew + BMC team dispatched" },
+            { "status": "On Scene", "timestamp": "2026-04-14T11:25:00", "actor": "system", "note": "Team arrived. Family safe." },
+            { "status": "Resolved", "timestamp": "2026-04-14T12:10:00", "actor": "operator", "note": "Tree removed. Building declared safe." }
         ],
-        "timestamp": "2026-03-25T21:08:03.635569",
-        "assigned_vehicle": "amb-2"
+        "timestamp": "2026-04-14T11:00:00"
     },
     {
-        "id": 1,
-        "original_message": "SOS! Massive fire broke out in a commercial building. at Dadar Station.",
-        "category": "Fire",
+        "id": 1010,
+        "original_message": "Suspected toxic chemical spill near Mahul Creek industrial area. Workers complaining of breathing difficulty and eye irritation. Wind carrying fumes towards residential area.",
+        "category": "Chemical Hazard",
         "priority": "Critical",
+        "urgency": "Life-threatening",
+        "need_type": ["Fire", "Medical", "Police"],
+        "summary": "Toxic chemical spill at Mahul Creek affecting residential areas",
         "severity_score": 9,
-        "authenticity_score": 8,
-        "location": "Dadar Station, Dadar, Mumbai",
-        "coordinates": {
-            "lat": 19.014918223351575,
-            "lng": 72.83898122295304
-        },
-        "need_type": [
-            "Fire",
-            "Rescue"
-        ],
-        "timestamp": "2026-02-10T19:36:33.504676",
-        "status": "Dispatched",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T19:36:33.504676",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-25T20:59:01.351330",
-                "actor": "dispatcher",
-                "note": "Unit fire-1 dispatched"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
+        "coordinates": { "lat": 19.0195, "lng": 72.8930 },
+        "location": "Mahul Creek Industrial Zone",
+        "location_text": "BPCL industrial corridor, Mahul Road, Chembur",
+        "venue_name": "Mahul Industrial Zone",
+        "floor": "Ground Level",
+        "room_or_zone": "Tank Farm Area",
+        "reporter_type": "Staff",
         "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "fire-1"
-    },
-    {
-        "id": 2,
-        "original_message": "SOS! Car collision with multiple injuries reported. at Mulund Check Naka.",
-        "category": "Accident",
-        "priority": "High",
-        "severity_score": 7,
+        "channel": "dashboard_form",
+        "affected_people_count": 80,
         "authenticity_score": 9,
-        "location": "Mulund Check Naka, Mulund, Mumbai",
-        "coordinates": {
-            "lat": 19.170893167229437,
-            "lng": 72.96294969334393
-        },
-        "need_type": [
-            "Medical",
-            "Police"
-        ],
-        "timestamp": "2026-02-10T18:14:33.504694",
-        "status": "Dispatched",
+        "reasoning": "Industrial safety officer confirmed spill. MPCB alerted.",
+        "flags": [],
+        "status": "Acknowledged",
         "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T18:14:33.504694",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-25T21:01:28.315689",
-                "actor": "dispatcher",
-                "note": "Unit amb-1 dispatched"
-            }
+            { "status": "Created", "timestamp": "2026-04-14T13:05:00", "actor": "reporter", "note": "Safety officer at industrial facility" },
+            { "status": "Acknowledged", "timestamp": "2026-04-14T13:06:30", "actor": "operator", "note": "HazMat team notified. Evacuation being planned." }
         ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "amb-1"
+        "timestamp": "2026-04-14T13:05:00"
     },
     {
-        "id": 3,
-        "original_message": "SOS! Stray leopard spotted near residential complex. at Marine Drive.",
-        "category": "Animal Rescue",
-        "priority": "Moderate",
-        "severity_score": 4,
-        "authenticity_score": 8,
-        "location": "Marine Drive, Marine Lines, Mumbai",
-        "coordinates": {
-            "lat": 18.948648536475872,
-            "lng": 72.81956374353967
-        },
-        "need_type": [
-            "Forest Dept",
-            "Police"
-        ],
-        "timestamp": "2026-02-10T17:56:33.504702",
-        "status": "Dispatched",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T17:56:33.504702",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-29T17:07:30.615730",
-                "actor": "dispatcher",
-                "note": "Unit pol-1 dispatched"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "pol-1"
-    },
-    {
-        "id": 4,
-        "original_message": "SOS! Stray leopard spotted near residential complex. at Andheri Station.",
-        "category": "Animal Rescue",
-        "priority": "Moderate",
-        "severity_score": 4,
-        "authenticity_score": 9,
-        "location": "Andheri Station, Andheri, Mumbai",
-        "coordinates": {
-            "lat": 19.117629557464817,
-            "lng": 72.84106485013997
-        },
-        "need_type": [
-            "Forest Dept",
-            "Police"
-        ],
-        "timestamp": "2026-02-10T18:48:33.504707",
-        "status": "On Scene",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T18:48:33.504707",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-29T16:18:56.503959",
-                "actor": "dispatcher",
-                "note": "Unit pol-1 dispatched"
-            },
-            {
-                "status": "On Scene",
-                "timestamp": "2026-03-29T16:25:51.275380",
-                "actor": "system",
-                "note": "Patrol Alpha reached destination"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "pol-1"
-    },
-    {
-        "id": 5,
-        "original_message": "SOS! Water logging blocking main access road. at Chembur Monorail.",
+        "id": 1011,
+        "original_message": "Sea wall breach at Worli Sea Face. High tide waves crashing over promenade wall. Two-wheeler riders swept off road. Coast Guard notified.",
         "category": "Flooding",
         "priority": "High",
-        "severity_score": 6,
-        "authenticity_score": 9,
-        "location": "Chembur Monorail, Chembur, Mumbai",
-        "coordinates": {
-            "lat": 19.05620943799813,
-            "lng": 72.89205712936952
-        },
-        "need_type": [
-            "Police",
-            "Rescue"
-        ],
-        "timestamp": "2026-02-10T19:12:33.504710",
-        "status": "Dispatched",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T19:12:33.504710",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Acknowledged",
-                "timestamp": "2026-03-25T21:07:18.188415",
-                "actor": "operator",
-                "note": "Manually set to Acknowledged"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-29T15:52:02.074357",
-                "actor": "dispatcher",
-                "note": "Unit pol-1 dispatched"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
+        "urgency": "Urgent",
+        "need_type": ["Rescue", "Police"],
+        "summary": "Sea wall breach endangering commuters at Worli Sea Face",
+        "severity_score": 8,
+        "coordinates": { "lat": 19.0130, "lng": 72.8145 },
+        "location": "Worli Sea Face Promenade",
+        "location_text": "Worli Sea Face Road, near Haji Ali",
+        "venue_name": "Worli Sea Face",
+        "floor": "Road Level",
+        "room_or_zone": "Coastal Road Section",
         "reporter_type": "Guest",
         "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "pol-1"
-    },
-    {
-        "id": 6,
-        "original_message": "SOS! Huge tree fell on a parked car, blocking traffic. at Andheri Station.",
-        "category": "Tree Fall",
-        "priority": "Moderate",
-        "severity_score": 5,
-        "authenticity_score": 9,
-        "location": "Andheri Station, Andheri, Mumbai",
-        "coordinates": {
-            "lat": 19.11256703587199,
-            "lng": 72.84435799725803
-        },
-        "need_type": [
-            "Fire",
-            "Municipality"
-        ],
-        "timestamp": "2026-02-10T19:16:33.504714",
-        "status": "Dispatched",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T19:16:33.504714",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-25T21:07:50.646777",
-                "actor": "dispatcher",
-                "note": "Unit pol-1 dispatched"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "pol-1"
-    },
-    {
-        "id": 7,
-        "original_message": "SOS! Stray leopard spotted near residential complex. at Vikhroli Station.",
-        "category": "Animal Rescue",
-        "priority": "Moderate",
-        "severity_score": 4,
+        "channel": "dashboard_form",
+        "affected_people_count": 10,
         "authenticity_score": 8,
-        "location": "Vikhroli Station, Vikhroli, Mumbai",
-        "coordinates": {
-            "lat": 19.112278309248758,
-            "lng": 72.92638400369377
-        },
-        "need_type": [
-            "Forest Dept",
-            "Police"
-        ],
-        "timestamp": "2026-02-10T19:37:33.504717",
+        "reasoning": "IMD high-tide warning corroborates. Video evidence shared.",
+        "flags": [],
         "status": "Dispatched",
         "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T19:37:33.504717",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-25T21:07:46.749527",
-                "actor": "dispatcher",
-                "note": "Unit pol-1 dispatched"
-            }
+            { "status": "Created", "timestamp": "2026-04-14T12:40:00", "actor": "reporter", "note": "Pedestrian near Worli Sea Face" },
+            { "status": "Acknowledged", "timestamp": "2026-04-14T12:41:30", "actor": "operator", "note": "Coast Guard liaison activated" },
+            { "status": "Dispatched", "timestamp": "2026-04-14T12:43:00", "actor": "dispatcher", "note": "Police patrol diverted" }
         ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "pol-1"
+        "timestamp": "2026-04-14T12:40:00"
     },
     {
-        "id": 8,
-        "original_message": "SOS! Huge tree fell on a parked car, blocking traffic. at Goregaon Hub Mall.",
-        "category": "Tree Fall",
-        "priority": "Moderate",
-        "severity_score": 5,
-        "authenticity_score": 8,
-        "location": "Goregaon Hub Mall, Goregaon, Mumbai",
-        "coordinates": {
-            "lat": 19.163487313397336,
-            "lng": 72.85479190163277
-        },
-        "need_type": [
-            "Fire",
-            "Municipality"
-        ],
-        "timestamp": "2026-02-10T18:53:33.504720",
-        "status": "Dispatched",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T18:53:33.504720",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-29T16:31:05.146602",
-                "actor": "dispatcher",
-                "note": "Unit amb-2 dispatched"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "amb-2"
-    },
-    {
-        "id": 9,
-        "original_message": "SOS! Severe cardiac arrest patient collapsed on road. at Marine Drive.",
+        "id": 1012,
+        "original_message": "Child fell into open manhole near Juhu Beach. Rescuers attempting retrieval. Child conscious but injured leg. Need immediate medical backup.",
         "category": "Medical Emergency",
         "priority": "Critical",
-        "severity_score": 8,
-        "authenticity_score": 10,
-        "location": "Marine Drive, Marine Lines, Mumbai",
-        "coordinates": {
-            "lat": 18.941171203895546,
-            "lng": 72.82577320627986
-        },
-        "need_type": [
-            "Medical",
-            "Ambulance"
-        ],
-        "timestamp": "2026-02-10T19:15:33.504723",
-        "status": "Dispatched",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T19:15:33.504723",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-25T21:07:12.008608",
-                "actor": "dispatcher",
-                "note": "Unit amb-2 dispatched"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "amb-2"
-    },
-    {
-        "id": 10,
-        "original_message": "SOS! Public disturbance and crowd gathering aggressively. at Gateway of India.",
-        "category": "Riot Control",
-        "priority": "Critical",
-        "severity_score": 8,
-        "authenticity_score": 10,
-        "location": "Gateway of India, Colaba, Mumbai",
-        "coordinates": {
-            "lat": 18.926229197163185,
-            "lng": 72.82980382940175
-        },
-        "need_type": [
-            "Police",
-            "Crowd Control"
-        ],
-        "timestamp": "2026-02-10T18:52:33.504727",
-        "status": "Dispatched",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T18:52:33.504727",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-24T22:10:54.302835",
-                "actor": "dispatcher",
-                "note": "Unit pol-1 dispatched"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "affected_people_count": 1,
-        "assigned_vehicle": "pol-1"
-    },
-    {
-        "id": 11,
-        "original_message": "SOS! Severe cardiac arrest patient collapsed on road. at Powai Lake.",
-        "category": "Medical Emergency",
-        "priority": "Critical",
-        "severity_score": 8,
-        "authenticity_score": 10,
-        "location": "Powai Lake, Powai, Mumbai",
-        "coordinates": {
-            "lat": 19.11997870589396,
-            "lng": 72.90013140054249
-        },
-        "need_type": [
-            "Medical",
-            "Ambulance"
-        ],
-        "timestamp": "2026-02-10T18:27:33.504730",
-        "status": "Dispatched",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T18:27:33.504730",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Acknowledged",
-                "timestamp": "2026-03-25T21:07:34.128350",
-                "actor": "operator",
-                "note": "Manually set to Acknowledged"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-29T16:30:50.875411",
-                "actor": "dispatcher",
-                "note": "Unit amb-1 dispatched"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "amb-1"
-    },
-    {
-        "id": 12,
-        "original_message": "SOS! Massive fire broke out in a commercial building. at Kandivali Station.",
-        "category": "Fire",
-        "priority": "Critical",
+        "urgency": "Life-threatening",
+        "need_type": ["Rescue", "Medical"],
+        "summary": "Child trapped in manhole near Juhu Beach",
         "severity_score": 9,
-        "authenticity_score": 7,
-        "location": "Kandivali Station, Kandivali, Mumbai",
-        "coordinates": {
-            "lat": 19.206976507005074,
-            "lng": 72.85276285492662
-        },
-        "need_type": [
-            "Fire",
-            "Rescue"
-        ],
-        "timestamp": "2026-02-10T17:56:33.504733",
-        "status": "On Scene",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T17:56:33.504733",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-29T15:51:42.732413",
-                "actor": "dispatcher",
-                "note": "Unit fire-1 dispatched"
-            },
-            {
-                "status": "On Scene",
-                "timestamp": "2026-03-29T15:57:52.398636",
-                "actor": "system",
-                "note": "Fire Engine 4 reached destination"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
+        "coordinates": { "lat": 19.0896, "lng": 72.8262 },
+        "location": "Juhu Beach Road",
+        "location_text": "Near Juhu Beach entrance, Ville Parle West",
+        "venue_name": "Juhu Beach Public Area",
+        "floor": "Below Ground",
+        "room_or_zone": "Manhole #JB-2245",
         "reporter_type": "Guest",
         "source": "manual_report",
-        "channel": "dashboard",
+        "channel": "dashboard_form",
         "affected_people_count": 1,
-        "assigned_vehicle": "fire-1"
-    },
-    {
-        "id": 13,
-        "original_message": "SOS! Old building collapsed, people trapped under debris. at Lower Parel.",
-        "category": "Structure Collapse",
-        "priority": "Critical",
-        "severity_score": 10,
-        "authenticity_score": 9,
-        "location": "Lower Parel, Lower Parel, Mumbai",
-        "coordinates": {
-            "lat": 18.991161663355783,
-            "lng": 72.8329504575683
-        },
-        "need_type": [
-            "Fire",
-            "Medical",
-            "Police",
-            "NDRF"
-        ],
-        "timestamp": "2026-02-10T17:47:33.504736",
-        "status": "Dispatched",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T17:47:33.504736",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-25T21:07:12.414456",
-                "actor": "dispatcher",
-                "note": "Unit fire-1 dispatched"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "fire-1"
-    },
-    {
-        "id": 14,
-        "original_message": "SOS! Severe cardiac arrest patient collapsed on road. at Girgaon Chowpatty.",
-        "category": "Medical Emergency",
-        "priority": "Critical",
-        "severity_score": 8,
-        "authenticity_score": 8,
-        "location": "Girgaon Chowpatty, Girgaon, Mumbai",
-        "coordinates": {
-            "lat": 18.94701198016934,
-            "lng": 72.82010551682602
-        },
-        "need_type": [
-            "Medical",
-            "Ambulance"
-        ],
-        "timestamp": "2026-02-10T18:17:33.504739",
-        "status": "Dispatched",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T18:17:33.504739",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-29T16:15:44.988100",
-                "actor": "dispatcher",
-                "note": "Unit amb-2 dispatched"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "amb-2"
-    },
-    {
-        "id": 15,
-        "original_message": "SOS! Water logging blocking main access road. at Vikhroli Station.",
-        "category": "Flooding",
-        "priority": "High",
-        "severity_score": 6,
         "authenticity_score": 10,
-        "location": "Vikhroli Station, Vikhroli, Mumbai",
-        "coordinates": {
-            "lat": 19.10514027317376,
-            "lng": 72.93167922851745
-        },
-        "need_type": [
-            "Police",
-            "Rescue"
-        ],
-        "timestamp": "2026-02-10T18:22:33.504743",
-        "status": "On Scene",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T18:22:33.504743",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-29T17:00:37.789748",
-                "actor": "dispatcher",
-                "note": "Unit fire-1 dispatched"
-            },
-            {
-                "status": "On Scene",
-                "timestamp": "2026-03-29T17:04:04.771240",
-                "actor": "system",
-                "note": "Fire Engine 4 reached destination"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "fire-1"
-    },
-    {
-        "id": 16,
-        "original_message": "SOS! Car collision with multiple injuries reported. at Colaba Causeway.",
-        "category": "Accident",
-        "priority": "High",
-        "severity_score": 7,
-        "authenticity_score": 8,
-        "location": "Colaba Causeway, Colaba, Mumbai",
-        "coordinates": {
-            "lat": 18.912960865168394,
-            "lng": 72.82996570429408
-        },
-        "need_type": [
-            "Medical",
-            "Police"
-        ],
-        "timestamp": "2026-02-10T17:51:33.504746",
-        "status": "Dispatched",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T17:51:33.504746",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-25T21:07:12.326828",
-                "actor": "dispatcher",
-                "note": "Unit amb-2 dispatched"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "amb-2"
-    },
-    {
-        "id": 17,
-        "original_message": "SOS! Water logging blocking main access road. at Girgaon Chowpatty.",
-        "category": "Flooding",
-        "priority": "High",
-        "severity_score": 6,
-        "authenticity_score": 3,
-        "location": "Girgaon Chowpatty, Girgaon, Mumbai",
-        "coordinates": {
-            "lat": 18.951122586410534,
-            "lng": 72.8225872793595
-        },
-        "need_type": [
-            "Police",
-            "Rescue"
-        ],
-        "timestamp": "2026-02-10T19:23:33.504749"
-    },
-    {
-        "id": 18,
-        "original_message": "SOS! Severe cardiac arrest patient collapsed on road. at Girgaon Chowpatty.",
-        "category": "Medical Emergency",
-        "priority": "Critical",
-        "severity_score": 8,
-        "authenticity_score": 9,
-        "location": "Girgaon Chowpatty, Girgaon, Mumbai",
-        "coordinates": {
-            "lat": 18.95049091041436,
-            "lng": 72.8208004333855
-        },
-        "need_type": [
-            "Medical",
-            "Ambulance"
-        ],
-        "timestamp": "2026-02-10T19:04:33.504752",
-        "status": "Dispatched",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T19:04:33.504752",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-25T21:01:28.165287",
-                "actor": "dispatcher",
-                "note": "Unit amb-2 dispatched"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "amb-2"
-    },
-    {
-        "id": 19,
-        "original_message": "SOS! Stray leopard spotted near residential complex. at Powai Lake.",
-        "category": "Animal Rescue",
-        "priority": "Moderate",
-        "severity_score": 4,
-        "authenticity_score": 10,
-        "location": "Powai Lake, Powai, Mumbai",
-        "coordinates": {
-            "lat": 19.123942444607007,
-            "lng": 72.90670081897268
-        },
-        "need_type": [
-            "Forest Dept",
-            "Police"
-        ],
-        "timestamp": "2026-02-10T19:41:33.504757",
-        "status": "Dispatched",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T19:41:33.504757",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-25T21:07:44.018525",
-                "actor": "dispatcher",
-                "note": "Unit pol-1 dispatched"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "pol-1"
-    },
-    {
-        "id": 20,
-        "original_message": "SOS! Huge tree fell on a parked car, blocking traffic. at Vikhroli Station.",
-        "category": "Tree Fall",
-        "priority": "Moderate",
-        "severity_score": 5,
-        "authenticity_score": 5,
-        "location": "Vikhroli Station, Vikhroli, Mumbai",
-        "coordinates": {
-            "lat": 19.11457050594197,
-            "lng": 72.9313033735621
-        },
-        "need_type": [
-            "Fire",
-            "Municipality"
-        ],
-        "timestamp": "2026-02-10T18:57:33.504760",
-        "status": "Dispatched",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T18:57:33.504760",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-29T15:52:10.127274",
-                "actor": "dispatcher",
-                "note": "Unit pol-1 dispatched"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "pol-1"
-    },
-    {
-        "id": 21,
-        "original_message": "SOS! Stray leopard spotted near residential complex. at Vikhroli Station.",
-        "category": "Animal Rescue",
-        "priority": "Moderate",
-        "severity_score": 4,
-        "authenticity_score": 8,
-        "location": "Vikhroli Station, Vikhroli, Mumbai",
-        "coordinates": {
-            "lat": 19.10974545457155,
-            "lng": 72.93433519812376
-        },
-        "need_type": [
-            "Forest Dept",
-            "Police"
-        ],
-        "timestamp": "2026-02-10T18:27:33.504763",
-        "status": "On Scene",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T18:27:33.504763",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-29T17:00:29.782307",
-                "actor": "dispatcher",
-                "note": "Unit pol-1 dispatched"
-            },
-            {
-                "status": "On Scene",
-                "timestamp": "2026-03-29T17:02:45.025335",
-                "actor": "system",
-                "note": "Patrol Alpha reached destination"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "pol-1"
-    },
-    {
-        "id": 22,
-        "original_message": "SOS! Public disturbance and crowd gathering aggressively. at Gateway of India.",
-        "category": "Riot Control",
-        "priority": "Critical",
-        "severity_score": 8,
-        "authenticity_score": 7,
-        "location": "Gateway of India, Colaba, Mumbai",
-        "coordinates": {
-            "lat": 18.919298292829207,
-            "lng": 72.83923083181725
-        },
-        "need_type": [
-            "Police",
-            "Crowd Control"
-        ],
-        "timestamp": "2026-02-10T18:09:33.504766",
-        "status": "Dispatched",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T18:09:33.504766",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-25T21:04:45.620383",
-                "actor": "dispatcher",
-                "note": "Unit pol-1 dispatched"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "pol-1"
-    },
-    {
-        "id": 23,
-        "original_message": "SOS! Toxic gas smell reported near residential area. at Dadar Station.",
-        "category": "Gas Leak",
-        "priority": "Critical",
-        "severity_score": 9,
-        "authenticity_score": 8,
-        "location": "Dadar Station, Dadar, Mumbai",
-        "coordinates": {
-            "lat": 19.014077332840184,
-            "lng": 72.841242910439
-        },
-        "need_type": [
-            "Fire",
-            "Evacuation"
-        ],
-        "timestamp": "2026-02-10T18:50:33.504771",
+        "reasoning": "Eyewitness account, bystanders assisting. Fire crew on way.",
+        "flags": [],
         "status": "Resolved",
         "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T18:50:33.504771",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-29T16:22:16.987812",
-                "actor": "dispatcher",
-                "note": "Unit fire-1 dispatched"
-            },
-            {
-                "status": "On Scene",
-                "timestamp": "2026-03-29T16:24:51.889831",
-                "actor": "system",
-                "note": "Fire Engine 4 reached destination"
-            },
-            {
-                "status": "Resolved",
-                "timestamp": "2026-03-29T17:08:52.950767",
-                "actor": "operator",
-                "note": "Manually set to Resolved"
-            }
+            { "status": "Created", "timestamp": "2026-04-14T10:30:00", "actor": "reporter", "note": "Bystander reported child in manhole" },
+            { "status": "Acknowledged", "timestamp": "2026-04-14T10:31:00", "actor": "operator", "note": "Verified. Fire crew alerted." },
+            { "status": "Dispatched", "timestamp": "2026-04-14T10:32:00", "actor": "dispatcher", "note": "Ambulance + Fire crew dispatched" },
+            { "status": "On Scene", "timestamp": "2026-04-14T10:42:00", "actor": "system", "note": "Units arrived. Rescue underway." },
+            { "status": "Resolved", "timestamp": "2026-04-14T11:05:00", "actor": "operator", "note": "Child rescued safely. Taken to Nanavati Hospital." }
         ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "fire-1"
+        "timestamp": "2026-04-14T10:30:00"
     },
     {
-        "id": 24,
-        "original_message": "SOS! Water logging blocking main access road. at Vikhroli Station.",
-        "category": "Flooding",
+        "id": 1013,
+        "original_message": "Power cables down across Linking Road, Bandra. Live wires sparking on wet road. Pedestrians at extreme risk. Area needs immediate barricading.",
+        "category": "Infrastructure Damage",
         "priority": "High",
-        "severity_score": 6,
-        "authenticity_score": 7,
-        "location": "Vikhroli Station, Vikhroli, Mumbai",
-        "coordinates": {
-            "lat": 19.10644693633874,
-            "lng": 72.92959663156932
-        },
-        "need_type": [
-            "Police",
-            "Rescue"
-        ],
-        "timestamp": "2026-02-10T18:09:33.504774",
-        "status": "Dispatched",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T18:09:33.504774",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-29T17:07:19.230142",
-                "actor": "dispatcher",
-                "note": "Unit amb-1 dispatched"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "amb-1"
-    },
-    {
-        "id": 25,
-        "original_message": "SOS! Massive fire broke out in a commercial building. at Borivali National Park.",
-        "category": "Fire",
-        "priority": "Critical",
-        "severity_score": 9,
-        "authenticity_score": 8,
-        "location": "Borivali National Park, Borivali, Mumbai",
-        "coordinates": {
-            "lat": 19.22706464538446,
-            "lng": 72.86336306044095
-        },
-        "need_type": [
-            "Fire",
-            "Rescue"
-        ],
-        "timestamp": "2026-02-10T18:41:33.504777",
-        "status": "Dispatched",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T18:41:33.504777",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-25T21:04:45.411739",
-                "actor": "dispatcher",
-                "note": "Unit fire-1 dispatched"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "fire-1"
-    },
-    {
-        "id": 26,
-        "original_message": "SOS! Severe cardiac arrest patient collapsed on road. at Versova.",
-        "category": "Medical Emergency",
-        "priority": "Critical",
-        "severity_score": 8,
-        "authenticity_score": 10,
-        "location": "Versova, Versova, Mumbai",
-        "coordinates": {
-            "lat": 19.129048401843622,
-            "lng": 72.81760962889784
-        },
-        "need_type": [
-            "Medical",
-            "Ambulance"
-        ],
-        "timestamp": "2026-02-10T18:40:33.504780",
-        "status": "Dispatched",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T18:40:33.504780",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-24T22:10:54.404465",
-                "actor": "dispatcher",
-                "note": "Unit amb-1 dispatched"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "affected_people_count": 1,
-        "assigned_vehicle": "amb-1"
-    },
-    {
-        "id": 27,
-        "original_message": "SOS! Water logging blocking main access road. at Dadar Station.",
-        "category": "Flooding",
-        "priority": "High",
-        "severity_score": 6,
-        "authenticity_score": 10,
-        "location": "Dadar Station, Dadar, Mumbai",
-        "coordinates": {
-            "lat": 19.013346691101486,
-            "lng": 72.84575261922735
-        },
-        "need_type": [
-            "Police",
-            "Rescue"
-        ],
-        "timestamp": "2026-02-10T18:19:33.504783",
-        "status": "Dispatched",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T18:19:33.504783",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-29T16:31:20.718076",
-                "actor": "dispatcher",
-                "note": "Unit fire-1 dispatched"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "fire-1"
-    },
-    {
-        "id": 28,
-        "original_message": "SOS! Toxic gas smell reported near residential area. at Colaba Causeway.",
-        "category": "Gas Leak",
-        "priority": "Critical",
-        "severity_score": 9,
-        "authenticity_score": 8,
-        "location": "Colaba Causeway, Colaba, Mumbai",
-        "coordinates": {
-            "lat": 18.909000286990057,
-            "lng": 72.82010841078602
-        },
-        "need_type": [
-            "Fire",
-            "Evacuation"
-        ],
-        "timestamp": "2026-02-10T18:02:33.504786",
-        "status": "Dispatched",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T18:02:33.504786",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-29T15:51:42.661667",
-                "actor": "dispatcher",
-                "note": "Unit fire-1 dispatched"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "fire-1"
-    },
-    {
-        "id": 29,
-        "original_message": "SOS! Car collision with multiple injuries reported. at Goregaon Hub Mall.",
-        "category": "Accident",
-        "priority": "High",
+        "urgency": "Urgent",
+        "need_type": ["Police", "Fire"],
+        "summary": "Live power cables down on wet road at Linking Road",
         "severity_score": 7,
-        "authenticity_score": 9,
-        "location": "Goregaon Hub Mall, Goregaon, Mumbai",
-        "coordinates": {
-            "lat": 19.168406388899413,
-            "lng": 72.85493414073373
-        },
-        "need_type": [
-            "Medical",
-            "Police"
-        ],
-        "timestamp": "2026-02-10T17:46:33.504789",
-        "status": "Dispatched",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T17:46:33.504789",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-25T21:07:12.533594",
-                "actor": "dispatcher",
-                "note": "Unit amb-1 dispatched"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
+        "coordinates": { "lat": 19.0621, "lng": 72.8355 },
+        "location": "Linking Road, Bandra West",
+        "location_text": "Linking Road, near Bandra Talao",
+        "venue_name": "Linking Road Commercial Area",
+        "floor": "Road Level",
+        "room_or_zone": "Main Market Section",
         "reporter_type": "Guest",
         "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "amb-1"
-    },
-    {
-        "id": 30,
-        "original_message": "SOS! Massive fire broke out in a commercial building. at R City Mall.",
-        "category": "Fire",
-        "priority": "Critical",
-        "severity_score": 9,
-        "authenticity_score": 5,
-        "location": "R City Mall, Ghatkopar, Mumbai",
-        "coordinates": {
-            "lat": 19.09591931564953,
-            "lng": 72.91755057988898
-        },
-        "need_type": [
-            "Fire",
-            "Rescue"
-        ],
-        "timestamp": "2026-02-10T19:28:33.504794",
-        "status": "Dispatched",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T19:28:33.504794",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-25T20:59:01.377872",
-                "actor": "dispatcher",
-                "note": "Unit fire-1 dispatched"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "fire-1"
-    },
-    {
-        "id": 31,
-        "original_message": "SOS! Water logging blocking main access road. at Gateway of India.",
-        "category": "Flooding",
-        "priority": "High",
-        "severity_score": 6,
-        "authenticity_score": 10,
-        "location": "Gateway of India, Colaba, Mumbai",
-        "coordinates": {
-            "lat": 18.921439805447182,
-            "lng": 72.83461005734151
-        },
-        "need_type": [
-            "Police",
-            "Rescue"
-        ],
-        "timestamp": "2026-02-10T19:34:33.504797",
-        "status": "Dispatched",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T19:34:33.504797",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-25T21:07:48.240910",
-                "actor": "dispatcher",
-                "note": "Unit pol-1 dispatched"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "pol-1"
-    },
-    {
-        "id": 32,
-        "original_message": "SOS! Car collision with multiple injuries reported. at Sion Hospital.",
-        "category": "Accident",
-        "priority": "High",
-        "severity_score": 7,
-        "authenticity_score": 9,
-        "location": "Sion Hospital, Sion, Mumbai",
-        "coordinates": {
-            "lat": 19.03531719298266,
-            "lng": 72.86063306233473
-        },
-        "need_type": [
-            "Medical",
-            "Police"
-        ],
-        "timestamp": "2026-02-10T18:39:33.504800",
-        "status": "On Scene",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T18:39:33.504800",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-29T16:18:41.845997",
-                "actor": "dispatcher",
-                "note": "Unit amb-2 dispatched"
-            },
-            {
-                "status": "On Scene",
-                "timestamp": "2026-03-29T16:19:22.710460",
-                "actor": "system",
-                "note": "Ambulance 2 reached destination"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "amb-2"
-    },
-    {
-        "id": 33,
-        "original_message": "SOS! Car collision with multiple injuries reported. at Worli Sea Face.",
-        "category": "Accident",
-        "priority": "High",
-        "severity_score": 7,
-        "authenticity_score": 5,
-        "location": "Worli Sea Face, Worli, Mumbai",
-        "coordinates": {
-            "lat": 19.00943759532317,
-            "lng": 72.81235888494618
-        },
-        "need_type": [
-            "Medical",
-            "Police"
-        ],
-        "timestamp": "2026-02-10T17:42:33.504803",
-        "status": "On Scene",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T17:42:33.504803",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-29T15:51:42.816548",
-                "actor": "dispatcher",
-                "note": "Unit amb-2 dispatched"
-            },
-            {
-                "status": "On Scene",
-                "timestamp": "2026-03-29T15:54:31.709880",
-                "actor": "system",
-                "note": "Ambulance 2 reached destination"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "amb-2"
-    },
-    {
-        "id": 34,
-        "original_message": "SOS! Stray leopard spotted near residential complex. at Lower Parel.",
-        "category": "Animal Rescue",
-        "priority": "Moderate",
-        "severity_score": 4,
-        "authenticity_score": 10,
-        "location": "Lower Parel, Lower Parel, Mumbai",
-        "coordinates": {
-            "lat": 18.99824584248642,
-            "lng": 72.82978525002729
-        },
-        "need_type": [
-            "Forest Dept",
-            "Police"
-        ],
-        "timestamp": "2026-02-10T18:26:33.504806",
-        "status": "Dispatched",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T18:26:33.504806",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-29T17:07:14.280816",
-                "actor": "dispatcher",
-                "note": "Unit amb-1 dispatched"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "amb-1"
-    },
-    {
-        "id": 35,
-        "original_message": "SOS! Stray leopard spotted near residential complex. at Versova.",
-        "category": "Animal Rescue",
-        "priority": "Moderate",
-        "severity_score": 4,
-        "authenticity_score": 10,
-        "location": "Versova, Versova, Mumbai",
-        "coordinates": {
-            "lat": 19.130726044368696,
-            "lng": 72.81367804185068
-        },
-        "need_type": [
-            "Forest Dept",
-            "Police"
-        ],
-        "timestamp": "2026-02-10T18:49:33.504809",
-        "status": "On Scene",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T18:49:33.504809",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-29T17:00:22.982687",
-                "actor": "dispatcher",
-                "note": "Unit amb-2 dispatched"
-            },
-            {
-                "status": "On Scene",
-                "timestamp": "2026-03-29T17:04:08.279011",
-                "actor": "system",
-                "note": "Ambulance 2 reached destination"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "amb-2"
-    },
-    {
-        "id": 36,
-        "original_message": "SOS! Water logging blocking main access road. at Andheri Station.",
-        "category": "Flooding",
-        "priority": "High",
-        "severity_score": 6,
+        "channel": "dashboard_form",
+        "affected_people_count": 30,
         "authenticity_score": 7,
-        "location": "Andheri Station, Andheri, Mumbai",
-        "coordinates": {
-            "lat": 19.11065224433513,
-            "lng": 72.8419305422998
-        },
-        "need_type": [
-            "Police",
-            "Rescue"
-        ],
-        "timestamp": "2026-02-10T18:48:33.504813",
-        "status": "On Scene",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T18:48:33.504813",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-29T17:00:11.397907",
-                "actor": "dispatcher",
-                "note": "Unit amb-1 dispatched"
-            },
-            {
-                "status": "On Scene",
-                "timestamp": "2026-03-29T17:02:42.721104",
-                "actor": "system",
-                "note": "Ambulance 1 reached destination"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "amb-1"
-    },
-    {
-        "id": 3737,
-        "original_message": "SOS! Old building collapsed, people trapped under debris. at Borivali National Park.",
-        "category": "Structure Collapse",
-        "priority": "Critical",
-        "severity_score": 10,
-        "authenticity_score": 9,
-        "location": "Borivali National Park, Borivali, Mumbai",
-        "coordinates": {
-            "lat": 19.233130189248165,
-            "lng": 72.85839082081382
-        },
-        "need_type": [
-            "Fire",
-            "Medical",
-            "Police",
-            "NDRF"
-        ],
-        "timestamp": "2026-02-10T19:04:33.504816",
-        "status": "Dispatched",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T19:04:33.504816",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-24T22:10:54.454447",
-                "actor": "dispatcher",
-                "note": "Unit fire-1 dispatched"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "affected_people_count": 1,
-        "assigned_vehicle": "fire-1"
-    },
-    {
-        "id": 38,
-        "original_message": "SOS! Water logging blocking main access road. at Worli Sea Face.",
-        "category": "Flooding",
-        "priority": "High",
-        "severity_score": 6,
-        "authenticity_score": 8,
-        "location": "Worli Sea Face, Worli, Mumbai",
-        "coordinates": {
-            "lat": 19.014592053651278,
-            "lng": 72.81701489784022
-        },
-        "need_type": [
-            "Police",
-            "Rescue"
-        ],
-        "timestamp": "2026-02-10T18:55:33.504819",
-        "status": "On Scene",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T18:55:33.504819",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Acknowledged",
-                "timestamp": "2026-03-25T21:09:27.338600",
-                "actor": "operator",
-                "note": "Manually set to Acknowledged"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-29T15:52:11.502662",
-                "actor": "dispatcher",
-                "note": "Unit pol-1 dispatched"
-            },
-            {
-                "status": "On Scene",
-                "timestamp": "2026-03-29T15:54:51.913943",
-                "actor": "system",
-                "note": "Patrol Alpha reached destination"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "pol-1"
-    },
-    {
-        "id": 39,
-        "original_message": "SOS! Massive fire broke out in a commercial building. at Vikhroli Station.",
-        "category": "Fire",
-        "priority": "Critical",
-        "severity_score": 9,
-        "authenticity_score": 10,
-        "location": "Vikhroli Station, Vikhroli, Mumbai",
-        "coordinates": {
-            "lat": 19.10753965841414,
-            "lng": 72.93095786287567
-        },
-        "need_type": [
-            "Fire",
-            "Rescue"
-        ],
-        "timestamp": "2026-02-10T18:18:33.504822",
-        "status": "Dispatched",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T18:18:33.504822",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-25T21:07:12.147399",
-                "actor": "dispatcher",
-                "note": "Unit fire-1 dispatched"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "fire-1"
-    },
-    {
-        "id": 40,
-        "original_message": "SOS! Toxic gas smell reported near residential area. at R City Mall.",
-        "category": "Gas Leak",
-        "priority": "Critical",
-        "severity_score": 9,
-        "authenticity_score": 5,
-        "location": "R City Mall, Ghatkopar, Mumbai",
-        "coordinates": {
-            "lat": 19.094121998083605,
-            "lng": 72.91424170545352
-        },
-        "need_type": [
-            "Fire",
-            "Evacuation"
-        ],
-        "timestamp": "2026-02-10T18:10:33.504825",
-        "status": "Dispatched",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T18:10:33.504825",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-25T21:07:12.222651",
-                "actor": "dispatcher",
-                "note": "Unit fire-1 dispatched"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "fire-1"
-    },
-    {
-        "id": 41,
-        "original_message": "SOS! Massive fire broke out in a commercial building. at Borivali National Park.",
-        "category": "Fire",
-        "priority": "Critical",
-        "severity_score": 9,
-        "authenticity_score": 8,
-        "location": "Borivali National Park, Borivali, Mumbai",
-        "coordinates": {
-            "lat": 19.23012006683265,
-            "lng": 72.85512611357528
-        },
-        "need_type": [
-            "Fire",
-            "Rescue"
-        ],
-        "timestamp": "2026-02-10T18:54:33.504828",
-        "status": "Dispatched",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T18:54:33.504828",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-25T20:59:01.377872",
-                "actor": "dispatcher",
-                "note": "Unit fire-1 dispatched"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "fire-1"
-    },
-    {
-        "id": 42,
-        "original_message": "SOS! Old building collapsed, people trapped under debris. at Borivali National Park.",
-        "category": "Structure Collapse",
-        "priority": "Critical",
-        "severity_score": 10,
-        "authenticity_score": 9,
-        "location": "Borivali National Park, Borivali, Mumbai",
-        "coordinates": {
-            "lat": 19.23465374391399,
-            "lng": 72.86189196891787
-        },
-        "need_type": [
-            "Fire",
-            "Medical",
-            "Police",
-            "NDRF"
-        ],
-        "timestamp": "2026-02-10T19:29:33.504831",
-        "status": "Dispatched",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T19:29:33.504831",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-24T22:10:54.240822",
-                "actor": "dispatcher",
-                "note": "Unit fire-1 dispatched"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "affected_people_count": 1,
-        "assigned_vehicle": "fire-1"
-    },
-    {
-        "id": 43,
-        "original_message": "SOS! Stray leopard spotted near residential complex. at Borivali National Park.",
-        "category": "Animal Rescue",
-        "priority": "Moderate",
-        "severity_score": 4,
-        "authenticity_score": 9,
-        "location": "Borivali National Park, Borivali, Mumbai",
-        "coordinates": {
-            "lat": 19.23479114177465,
-            "lng": 72.8588292762925
-        },
-        "need_type": [
-            "Forest Dept",
-            "Police"
-        ],
-        "timestamp": "2026-02-10T19:06:33.504834",
-        "status": "Dispatched",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T19:06:33.504834",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-25T21:07:52.751955",
-                "actor": "dispatcher",
-                "note": "Unit pol-1 dispatched"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "pol-1"
-    },
-    {
-        "id": 44,
-        "original_message": "SOS! Toxic gas smell reported near residential area. at Girgaon Chowpatty.",
-        "category": "Gas Leak",
-        "priority": "Critical",
-        "severity_score": 9,
-        "authenticity_score": 7,
-        "location": "Girgaon Chowpatty, Girgaon, Mumbai",
-        "coordinates": {
-            "lat": 18.951947225889803,
-            "lng": 72.81688352544582
-        },
-        "need_type": [
-            "Fire",
-            "Evacuation"
-        ],
-        "timestamp": "2026-02-10T18:19:33.504837",
-        "status": "Dispatched",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T18:19:33.504837",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-25T21:01:28.245390",
-                "actor": "dispatcher",
-                "note": "Unit fire-1 dispatched"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "fire-1"
-    },
-    {
-        "id": 45,
-        "original_message": "SOS! Severe cardiac arrest patient collapsed on road. at Colaba Causeway.",
-        "category": "Medical Emergency",
-        "priority": "Critical",
-        "severity_score": 8,
-        "authenticity_score": 8,
-        "location": "Colaba Causeway, Colaba, Mumbai",
-        "coordinates": {
-            "lat": 18.907897161179488,
-            "lng": 72.82892802826764
-        },
-        "need_type": [
-            "Medical",
-            "Ambulance"
-        ],
-        "timestamp": "2026-02-10T17:58:33.504842",
-        "status": "Dispatched",
-        "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T17:58:33.504842",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-29T16:15:45.236314",
-                "actor": "dispatcher",
-                "note": "Unit amb-2 dispatched"
-            }
-        ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "amb-2"
-    },
-    {
-        "id": 46,
-        "original_message": "SOS! Huge tree fell on a parked car, blocking traffic. at Andheri Station.",
-        "category": "Tree Fall",
-        "priority": "Moderate",
-        "severity_score": 5,
-        "authenticity_score": 9,
-        "location": "Andheri Station, Andheri, Mumbai",
-        "coordinates": {
-            "lat": 19.110226281706694,
-            "lng": 72.84724592048984
-        },
-        "need_type": [
-            "Fire",
-            "Municipality"
-        ],
-        "timestamp": "2026-02-10T18:52:33.504845",
+        "reasoning": "Consistent with storms. BEST maintenance dispatched.",
+        "flags": [],
         "status": "Resolved",
         "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T18:52:33.504845",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-29T16:31:11.568242",
-                "actor": "dispatcher",
-                "note": "Unit pol-1 dispatched"
-            },
-            {
-                "status": "Resolved",
-                "timestamp": "2026-03-29T17:08:44.932399",
-                "actor": "operator",
-                "note": "Manually set to Resolved"
-            }
+            { "status": "Created", "timestamp": "2026-04-14T09:15:00", "actor": "reporter", "note": "Shop owner on Linking Road" },
+            { "status": "Acknowledged", "timestamp": "2026-04-14T09:17:00", "actor": "operator", "note": "BEST disconnection request placed" },
+            { "status": "Dispatched", "timestamp": "2026-04-14T09:20:00", "actor": "dispatcher", "note": "Police patrol + BEST team" },
+            { "status": "On Scene", "timestamp": "2026-04-14T09:35:00", "actor": "system", "note": "Area barricaded. Power isolated." },
+            { "status": "Resolved", "timestamp": "2026-04-14T10:45:00", "actor": "operator", "note": "Cables repaired. Power restored." }
         ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
+        "timestamp": "2026-04-14T09:15:00"
+    },
+    {
+        "id": 1014,
+        "original_message": "Large sinkhole opened up on LBS Marg near Kurla. Road caved in approximately 8 meters wide. Traffic completely blocked. No casualties reported yet.",
+        "category": "Infrastructure Damage",
+        "priority": "High",
+        "urgency": "Urgent",
+        "need_type": ["Police"],
+        "summary": "Major sinkhole on LBS Marg blocking all traffic",
+        "severity_score": 6,
+        "coordinates": { "lat": 19.0710, "lng": 72.8796 },
+        "location": "LBS Marg, Kurla",
+        "location_text": "LBS Marg, near Kurla Bus Depot",
+        "venue_name": "LBS Marg Public Road",
+        "floor": "Road Level",
+        "room_or_zone": "Main Carriageway",
         "reporter_type": "Guest",
         "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "pol-1"
-    },
-    {
-        "id": 47,
-        "original_message": "SOS! Car collision with multiple injuries reported. at Vikhroli Station.",
-        "category": "Accident",
-        "priority": "High",
-        "severity_score": 7,
-        "authenticity_score": 3,
-        "location": "Vikhroli Station, Vikhroli, Mumbai",
-        "coordinates": {
-            "lat": 19.113264505704038,
-            "lng": 72.9310584194136
-        },
-        "need_type": [
-            "Medical",
-            "Police"
-        ],
-        "timestamp": "2026-02-10T18:50:33.504848"
-    },
-    {
-        "id": 48,
-        "original_message": "SOS! Car collision with multiple injuries reported. at Marine Drive.",
-        "category": "Accident",
-        "priority": "High",
-        "severity_score": 7,
+        "channel": "dashboard_form",
+        "affected_people_count": 50,
         "authenticity_score": 8,
-        "location": "Marine Drive, Marine Lines, Mumbai",
-        "coordinates": {
-            "lat": 18.941401445209774,
-            "lng": 72.82047354630134
-        },
-        "need_type": [
-            "Medical",
-            "Police"
-        ],
-        "timestamp": "2026-02-10T18:25:33.504853",
-        "status": "Dispatched",
+        "reasoning": "Multiple drivers reporting. BMC engineer contacted.",
+        "flags": [],
+        "status": "Acknowledged",
         "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T18:25:33.504853",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-25T21:04:45.489300",
-                "actor": "dispatcher",
-                "note": "Unit amb-2 dispatched"
-            }
+            { "status": "Created", "timestamp": "2026-04-14T13:00:00", "actor": "reporter", "note": "BEST bus driver reported road collapse" },
+            { "status": "Acknowledged", "timestamp": "2026-04-14T13:02:00", "actor": "operator", "note": "BMC emergency team alerted" }
         ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "amb-2"
+        "timestamp": "2026-04-14T13:00:00"
     },
     {
-        "id": 49,
-        "original_message": "SOS! Old building collapsed, people trapped under debris. at Kandivali Station.",
-        "category": "Structure Collapse",
-        "priority": "Critical",
-        "severity_score": 10,
+        "id": 1015,
+        "original_message": "Guest at ITC Maratha reporting armed robbery attempt in parking area. Two suspects fled towards highway. Hotel security has CCTV footage. Minor injuries to valet staff.",
+        "category": "Security Threat",
+        "priority": "High",
+        "urgency": "Urgent",
+        "need_type": ["Police", "Medical"],
+        "summary": "Armed robbery attempt at ITC Maratha parking lot",
+        "severity_score": 7,
+        "coordinates": { "lat": 19.1001, "lng": 72.8692 },
+        "location": "ITC Maratha Hotel, Andheri East",
+        "location_text": "ITC Maratha, Sahar Road, Andheri East",
+        "venue_name": "ITC Maratha Hotel",
+        "floor": "Basement Level",
+        "room_or_zone": "Parking Area B2",
+        "reporter_type": "Security",
+        "source": "panic_button",
+        "channel": "silent_alarm",
+        "panic_code": "SEC-02",
+        "affected_people_count": 3,
         "authenticity_score": 9,
-        "location": "Kandivali Station, Kandivali, Mumbai",
-        "coordinates": {
-            "lat": 19.208221959352443,
-            "lng": 72.85112577689945
-        },
-        "need_type": [
-            "Fire",
-            "Medical",
-            "Police",
-            "NDRF"
-        ],
-        "timestamp": "2026-02-10T19:33:33.504856",
+        "reasoning": "Security team confirmed. CCTV footage available.",
+        "flags": [],
         "status": "Dispatched",
         "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T19:33:33.504856",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-25T21:01:28.061847",
-                "actor": "dispatcher",
-                "note": "Unit fire-1 dispatched"
-            }
+            { "status": "Created", "timestamp": "2026-04-14T13:08:00", "actor": "panic-button", "note": "Silent alarm from hotel security" },
+            { "status": "Acknowledged", "timestamp": "2026-04-14T13:08:30", "actor": "operator", "note": "Police control room notified immediately" },
+            { "status": "Dispatched", "timestamp": "2026-04-14T13:09:30", "actor": "dispatcher", "note": "Patrol Alpha responding" }
         ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
-        "reporter_type": "Guest",
-        "source": "manual_report",
-        "channel": "dashboard",
-        "affected_people_count": 1,
-        "assigned_vehicle": "fire-1"
+        "timestamp": "2026-04-14T13:08:00"
     },
     {
-        "id": 50,
-        "original_message": "SOS! Old building collapsed, people trapped under debris. at Vikhroli Station.",
-        "category": "Structure Collapse",
-        "priority": "Critical",
-        "severity_score": 10,
-        "authenticity_score": 5,
-        "location": "Vikhroli Station, Vikhroli, Mumbai",
-        "coordinates": {
-            "lat": 19.105154163372806,
-            "lng": 72.9332556639367
-        },
-        "need_type": [
-            "Fire",
-            "Medical",
-            "Police",
-            "NDRF"
-        ],
-        "timestamp": "2026-02-10T19:38:33.504859",
-        "status": "Dispatched",
+        "id": 1016,
+        "original_message": "Food poisoning outbreak at wedding banquet in Goregaon. Over 20 guests experiencing severe nausea, vomiting, and diarrhea. Venue kitchen shut down. Urgent medical response needed.",
+        "category": "Medical Emergency",
+        "priority": "High",
+        "urgency": "Urgent",
+        "need_type": ["Medical"],
+        "summary": "Mass food poisoning at Goregaon banquet — 20+ affected",
+        "severity_score": 7,
+        "coordinates": { "lat": 19.1651, "lng": 72.8483 },
+        "location": "Nesco Convention Center, Goregaon",
+        "location_text": "Nesco Exhibition Center, Goregaon East",
+        "venue_name": "NESCO Banquet Hall",
+        "floor": "Hall 3",
+        "room_or_zone": "Wedding Banquet Area",
+        "reporter_type": "Staff",
+        "source": "manual_report",
+        "channel": "dashboard_form",
+        "affected_people_count": 22,
+        "authenticity_score": 8,
+        "reasoning": "Confirmed by venue manager. FDA notified.",
+        "flags": [],
+        "status": "On Scene",
         "status_timeline": [
-            {
-                "status": "Created",
-                "timestamp": "2026-02-10T19:38:33.504859",
-                "actor": "system",
-                "note": "Incident registered"
-            },
-            {
-                "status": "Dispatched",
-                "timestamp": "2026-03-24T22:10:54.209533",
-                "actor": "dispatcher",
-                "note": "Unit fire-1 dispatched"
-            }
+            { "status": "Created", "timestamp": "2026-04-14T11:30:00", "actor": "reporter", "note": "Venue staff reported mass illness" },
+            { "status": "Acknowledged", "timestamp": "2026-04-14T11:32:00", "actor": "operator", "note": "Multiple ambulances requested" },
+            { "status": "Dispatched", "timestamp": "2026-04-14T11:35:00", "actor": "dispatcher", "note": "2 ambulances dispatched" },
+            { "status": "On Scene", "timestamp": "2026-04-14T11:50:00", "actor": "system", "note": "Medical team triaging patients at venue" }
         ],
-        "venue_name": "Unknown Venue",
-        "floor": "Unknown",
-        "room_or_zone": "Unknown",
+        "timestamp": "2026-04-14T11:30:00"
+    },
+    {
+        "id": 1017,
+        "original_message": "Minor water pipe burst on MG Road, Fort. Water flooding basement shops. No injuries but significant property damage risk. Municipal valve shut-off needed.",
+        "category": "Infrastructure Damage",
+        "priority": "Moderate",
+        "urgency": "Minor",
+        "need_type": ["Rescue"],
+        "summary": "Water main burst flooding shops on MG Road",
+        "severity_score": 4,
+        "coordinates": { "lat": 18.9380, "lng": 72.8347 },
+        "location": "MG Road, Fort",
+        "location_text": "MG Road, near Kala Ghoda, Fort",
+        "venue_name": "MG Road Commercial Block",
+        "floor": "Basement Level",
+        "room_or_zone": "Shops B1-B5",
         "reporter_type": "Guest",
-        "affected_people_count": 1,
-        "assigned_vehicle": "fire-1"
+        "source": "manual_report",
+        "channel": "dashboard_form",
+        "affected_people_count": 8,
+        "authenticity_score": 7,
+        "reasoning": "Consistent with aging infrastructure reports for this area.",
+        "flags": [],
+        "status": "Resolved",
+        "status_timeline": [
+            { "status": "Created", "timestamp": "2026-04-14T08:20:00", "actor": "reporter", "note": "Shop owner called about flooding" },
+            { "status": "Acknowledged", "timestamp": "2026-04-14T08:25:00", "actor": "operator", "note": "BMC water dept contacted" },
+            { "status": "Dispatched", "timestamp": "2026-04-14T08:30:00", "actor": "dispatcher", "note": "BMC maintenance team sent" },
+            { "status": "On Scene", "timestamp": "2026-04-14T08:55:00", "actor": "system", "note": "Team isolating water supply" },
+            { "status": "Resolved", "timestamp": "2026-04-14T10:15:00", "actor": "operator", "note": "Pipe repaired. Water supply restored." }
+        ],
+        "timestamp": "2026-04-14T08:20:00"
+    },
+    {
+        "id": 1018,
+        "original_message": "Relief camp at Dharavi reporting shortage of clean drinking water and medical supplies. Over 150 displaced families need immediate assistance. Sanitation facilities inadequate.",
+        "category": "Relief & Supplies",
+        "priority": "Moderate",
+        "urgency": "Urgent",
+        "need_type": ["Supplies", "Medical"],
+        "summary": "Relief camp supply shortage affecting 150 families in Dharavi",
+        "severity_score": 5,
+        "coordinates": { "lat": 19.0438, "lng": 72.8534 },
+        "location": "Dharavi Relief Camp",
+        "location_text": "Community Hall, 90 Feet Road, Dharavi",
+        "venue_name": "Dharavi Community Relief Center",
+        "floor": "Ground Floor",
+        "room_or_zone": "Main Hall + Courtyard",
+        "reporter_type": "Staff",
+        "source": "manual_report",
+        "channel": "dashboard_form",
+        "affected_people_count": 150,
+        "authenticity_score": 9,
+        "reasoning": "Red Cross coordinator verified supply gaps.",
+        "flags": [],
+        "status": "Acknowledged",
+        "status_timeline": [
+            { "status": "Created", "timestamp": "2026-04-14T10:00:00", "actor": "reporter", "note": "Relief coordinator flagged supply shortage" },
+            { "status": "Acknowledged", "timestamp": "2026-04-14T10:10:00", "actor": "operator", "note": "MCGM disaster cell notified for resupply" }
+        ],
+        "timestamp": "2026-04-14T10:00:00"
     }
 ]

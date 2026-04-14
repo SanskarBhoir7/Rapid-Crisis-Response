@@ -1,16 +1,15 @@
 import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { AlertTriangle, MapPin, Clock, Truck, Shield, Activity, X, Navigation, MessageSquare, Send } from 'lucide-react';
+import { AlertTriangle, MapPin, Clock, Truck, Shield, Activity, X, Navigation, MessageSquare, Send, Zap, ShieldAlert, Users, Building } from 'lucide-react';
 import './App.css';
 
 export default function IncidentDetailPanel({ incident, onClose, onAssign, onStatusChange, vehicles }) {
-    // Calculate distances and sort vehicles (Simple Euclidean for now)
     const sortedVehicles = useMemo(() => {
         if (!vehicles || !incident) return [];
         return [...vehicles].sort((a, b) => {
             const distA = Math.hypot(a.lat - incident.coordinates.lat, a.lng - incident.coordinates.lng);
             const distB = Math.hypot(b.lat - incident.coordinates.lat, b.lng - incident.coordinates.lng);
-            return distA - distB; // Closest first
+            return distA - distB;
         });
     }, [incident, vehicles]);
 
@@ -26,6 +25,15 @@ export default function IncidentDetailPanel({ incident, onClose, onAssign, onSta
     const statusOptions = ['Acknowledged', 'En Route', 'On Scene', 'Resolved'];
     const timeline = Array.isArray(incident.status_timeline) ? [...incident.status_timeline].reverse() : [];
 
+    const statusColors = {
+        'Created': '#64748b',
+        'Acknowledged': '#3b82f6',
+        'Dispatched': '#8b5cf6',
+        'En Route': '#f59e0b',
+        'On Scene': '#06b6d4',
+        'Resolved': '#10b981',
+    };
+
     return (
         <motion.div
             className="sidebar right-sidebar glass"
@@ -34,30 +42,49 @@ export default function IncidentDetailPanel({ incident, onClose, onAssign, onSta
             exit={{ x: 400, opacity: 0 }}
             transition={{ type: "spring", stiffness: 300, damping: 30 }}
             style={{ borderLeft: `4px solid ${color}` }}
+            role="complementary"
+            aria-label="Incident detail panel"
         >
             <div className="sidebar-header">
                 <h2>
-                    <AlertTriangle color={color} className="icon-pulse" />
+                    <AlertTriangle color={color} className="icon-pulse" aria-hidden="true" />
                     Incident Command
                 </h2>
-                <button className="close-btn" onClick={onClose}><X size={20} /></button>
+                <button className="close-btn" onClick={onClose} aria-label="Close panel"><X size={20} /></button>
             </div>
 
             <div className="details-content">
                 <div className="incident-hero" style={{ borderColor: color }}>
-                    <span className="category-badge" style={{ backgroundColor: color + '33', color: color, border: `1px solid ${color}` }}>
-                        {incident.category}
-                    </span>
+                    <div className="hero-top-row">
+                        <span className="category-badge" style={{ backgroundColor: color + '33', color: color, border: `1px solid ${color}` }}>
+                            {incident.category}
+                        </span>
+                        <span className="status-badge" style={{ backgroundColor: (statusColors[incident.status] || '#64748b') + '33', color: statusColors[incident.status] || '#64748b' }}>
+                            {incident.status || 'Created'}
+                        </span>
+                    </div>
                     <h3>{incident.original_message}</h3>
                     <div className="hero-meta">
-                        <span><Clock size={14} /> {new Date(incident.timestamp).toLocaleTimeString()}</span>
+                        <span><Clock size={14} aria-hidden="true" /> {new Date(incident.timestamp).toLocaleTimeString()}</span>
                         <span>Severity: <strong>{incident.severity_score}/10</strong></span>
-                        <span>Status: <strong>{incident.status || 'Created'}</strong></span>
+                        <span><Users size={14} aria-hidden="true" /> {incident.affected_people_count || 1} affected</span>
+                    </div>
+
+                    {/* Severity visual bar */}
+                    <div className="hero-severity-bar">
+                        <div className="hero-severity-fill" style={{ width: `${incident.severity_score * 10}%`, backgroundColor: color }} />
+                        <div className="hero-severity-labels">
+                            <span>LOW</span>
+                            <span>CRITICAL</span>
+                        </div>
                     </div>
                 </div>
 
+                {/* AI Triage Section */}
+                <TriageSection incidentId={incident.id} />
+
                 <section className="detail-section">
-                    <h3><Clock size={16} /> Lifecycle Actions</h3>
+                    <h3><Clock size={16} aria-hidden="true" /> Lifecycle Actions</h3>
                     <div className="incident-override-list">
                         {statusOptions.map(status => (
                             <button
@@ -65,7 +92,9 @@ export default function IncidentDetailPanel({ incident, onClose, onAssign, onSta
                                 className="override-btn"
                                 disabled={incident.status === status}
                                 onClick={() => onStatusChange(incident.id, status)}
+                                aria-label={`Set status to ${status}`}
                             >
+                                <span className="override-dot" style={{ backgroundColor: statusColors[status] || '#64748b' }} />
                                 Set Status: {status}
                             </button>
                         ))}
@@ -73,7 +102,7 @@ export default function IncidentDetailPanel({ incident, onClose, onAssign, onSta
                 </section>
 
                 <section className="detail-section">
-                    <h3><MapPin size={16} /> Location</h3>
+                    <h3><MapPin size={16} aria-hidden="true" /> Location</h3>
                     <p className="location-text-large">{incident.location_text || incident.location}</p>
                     <p className="coords-text">
                         LAT: {incident.coordinates.lat.toFixed(4)} | LNG: {incident.coordinates.lng.toFixed(4)}
@@ -81,22 +110,35 @@ export default function IncidentDetailPanel({ incident, onClose, onAssign, onSta
                 </section>
 
                 <section className="detail-section">
-                    <h3><Shield size={16} /> Hospitality Context</h3>
-                    <p className="helper-text">Venue: <strong>{incident.venue_name || 'Unknown Venue'}</strong></p>
-                    <p className="helper-text">Floor: <strong>{incident.floor || 'Unknown'}</strong></p>
-                    <p className="helper-text">Room / Zone: <strong>{incident.room_or_zone || 'Unknown'}</strong></p>
-                    <p className="helper-text">Reporter: <strong>{incident.reporter_type || 'Guest'}</strong></p>
-                    <p className="helper-text">Affected People: <strong>{incident.affected_people_count || 1}</strong></p>
+                    <h3><Building size={16} aria-hidden="true" /> Hospitality Context</h3>
+                    <div className="context-grid">
+                        <div className="context-item">
+                            <span className="context-label">Venue</span>
+                            <span className="context-value">{incident.venue_name || 'Unknown Venue'}</span>
+                        </div>
+                        <div className="context-item">
+                            <span className="context-label">Floor</span>
+                            <span className="context-value">{incident.floor || 'Unknown'}</span>
+                        </div>
+                        <div className="context-item">
+                            <span className="context-label">Zone</span>
+                            <span className="context-value">{incident.room_or_zone || 'Unknown'}</span>
+                        </div>
+                        <div className="context-item">
+                            <span className="context-label">Reporter</span>
+                            <span className="context-value">{incident.reporter_type || 'Guest'}</span>
+                        </div>
+                    </div>
                 </section>
 
                 <section className="detail-section">
-                    <h3><Truck size={16} /> Dispatch Rescue Units</h3>
+                    <h3><Truck size={16} aria-hidden="true" /> Dispatch Units</h3>
                     <p className="helper-text">Select nearest available unit:</p>
 
                     <div className="vehicle-dispatch-list">
                         {sortedVehicles.map(vehicle => {
                             const isAvailable = vehicle.status === 'IDLE';
-                            const dist = Math.hypot(vehicle.lat - incident.coordinates.lat, vehicle.lng - incident.coordinates.lng) * 111; // Approx km
+                            const dist = Math.hypot(vehicle.lat - incident.coordinates.lat, vehicle.lng - incident.coordinates.lng) * 111;
 
                             return (
                                 <button
@@ -104,6 +146,7 @@ export default function IncidentDetailPanel({ incident, onClose, onAssign, onSta
                                     className={`dispatch-btn ${isAvailable ? 'available' : 'busy'}`}
                                     disabled={!isAvailable}
                                     onClick={() => onAssign(vehicle.id, incident.id)}
+                                    aria-label={`Dispatch ${vehicle.name}`}
                                 >
                                     <div className="v-icon">
                                         {vehicle.type === 'ambulance' && <Activity size={18} color={isAvailable ? "#ef4444" : "#64748b"} />}
@@ -121,16 +164,23 @@ export default function IncidentDetailPanel({ incident, onClose, onAssign, onSta
                     </div>
                 </section>
 
+                {/* Visual Timeline */}
                 <section className="detail-section">
-                    <h3><Clock size={16} /> Status Timeline</h3>
-                    <div className="incident-override-list">
-                        {timeline.slice(0, 6).map((entry, index) => (
-                            <div key={`${entry.timestamp}-${index}`} className="override-btn" style={{ cursor: 'default' }}>
-                                <div className="btn-row">
-                                    <span className="inc-summary">{entry.status}</span>
-                                    <span className="btn-loc">{new Date(entry.timestamp).toLocaleTimeString()}</span>
+                    <h3><Clock size={16} aria-hidden="true" /> Status Timeline</h3>
+                    <div className="visual-timeline">
+                        {timeline.slice(0, 8).map((entry, index) => (
+                            <div key={`${entry.timestamp}-${index}`} className="timeline-node">
+                                <div className="timeline-connector">
+                                    <div className="timeline-dot" style={{ backgroundColor: statusColors[entry.status] || '#64748b' }} />
+                                    {index < timeline.length - 1 && <div className="timeline-line" />}
                                 </div>
-                                <span className="btn-loc">{entry.actor || 'system'}{entry.note ? ` - ${entry.note}` : ''}</span>
+                                <div className="timeline-content">
+                                    <div className="timeline-top-row">
+                                        <span className="timeline-status" style={{ color: statusColors[entry.status] || '#64748b' }}>{entry.status}</span>
+                                        <span className="timeline-time">{new Date(entry.timestamp).toLocaleTimeString()}</span>
+                                    </div>
+                                    <span className="timeline-note">{entry.actor || 'system'}{entry.note ? ` — ${entry.note}` : ''}</span>
+                                </div>
                             </div>
                         ))}
                         {timeline.length === 0 && (
@@ -142,6 +192,100 @@ export default function IncidentDetailPanel({ incident, onClose, onAssign, onSta
                 <CommLogSection incidentId={incident.id} />
             </div>
         </motion.div>
+    );
+}
+
+
+function TriageSection({ incidentId }) {
+    const [triage, setTriage] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(false);
+
+    const fetchTriage = useCallback(async () => {
+        setLoading(true);
+        setError(false);
+        try {
+            const res = await fetch(`http://127.0.0.1:5001/ai_triage/${incidentId}`);
+            if (res.ok) {
+                const data = await res.json();
+                setTriage(data);
+            } else {
+                setError(true);
+            }
+        } catch (_) {
+            setError(true);
+        } finally {
+            setLoading(false);
+        }
+    }, [incidentId]);
+
+    useEffect(() => {
+        fetchTriage();
+    }, [fetchTriage]);
+
+    const riskColors = {
+        extreme: '#ef4444',
+        high: '#f59e0b',
+        moderate: '#3b82f6',
+        low: '#10b981',
+    };
+
+    return (
+        <section className="detail-section triage-section">
+            <h3><Zap size={16} aria-hidden="true" /> AI Triage Plan</h3>
+            {loading && <div className="triage-loading"><div className="loader small" /> Analyzing...</div>}
+            {error && <p className="triage-error">Unable to generate triage plan.</p>}
+            {triage && (
+                <div className="triage-content">
+                    <div className="triage-header-row">
+                        <span className="triage-risk" style={{ color: riskColors[triage.risk_level] || '#64748b', borderColor: riskColors[triage.risk_level] || '#64748b' }}>
+                            <ShieldAlert size={14} /> {(triage.risk_level || 'unknown').toUpperCase()} RISK
+                        </span>
+                        {triage.evacuation_needed && (
+                            <span className="triage-evac">⚠ EVACUATION NEEDED</span>
+                        )}
+                    </div>
+
+                    {triage.estimated_response_time && (
+                        <div className="triage-eta">
+                            <Clock size={13} /> ETA: {triage.estimated_response_time}
+                        </div>
+                    )}
+
+                    {triage.immediate_actions && triage.immediate_actions.length > 0 && (
+                        <div className="triage-block">
+                            <span className="triage-block-label">Immediate Actions</span>
+                            {triage.immediate_actions.map((a, i) => (
+                                <div key={i} className="triage-action-item">
+                                    <span className="triage-num">{i + 1}</span>
+                                    {a}
+                                </div>
+                            ))}
+                        </div>
+                    )}
+
+                    {triage.resources_needed && triage.resources_needed.length > 0 && (
+                        <div className="triage-block">
+                            <span className="triage-block-label">Resources Required</span>
+                            <div className="triage-resources">
+                                {triage.resources_needed.map((r, i) => (
+                                    <span key={i} className="triage-resource-tag">{r}</span>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {triage.special_considerations && triage.special_considerations.length > 0 && (
+                        <div className="triage-block">
+                            <span className="triage-block-label">⚠ Special Considerations</span>
+                            {triage.special_considerations.map((s, i) => (
+                                <p key={i} className="triage-consideration">{s}</p>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            )}
+        </section>
     );
 }
 
@@ -191,7 +335,7 @@ function CommLogSection({ incidentId }) {
 
     return (
         <section className="detail-section">
-            <h3><MessageSquare size={16} /> Communication Log</h3>
+            <h3><MessageSquare size={16} aria-hidden="true" /> Communication Log</h3>
             <div className="comm-input-row">
                 <input
                     type="text"
@@ -200,8 +344,9 @@ function CommLogSection({ incidentId }) {
                     onChange={(e) => setNewMsg(e.target.value)}
                     onKeyDown={(e) => { if (e.key === 'Enter') handleSend(); }}
                     disabled={sending}
+                    aria-label="Communication log input"
                 />
-                <button className="comm-send-btn" onClick={handleSend} disabled={sending || !newMsg.trim()}>
+                <button className="comm-send-btn" onClick={handleSend} disabled={sending || !newMsg.trim()} aria-label="Send note">
                     <Send size={14} />
                 </button>
             </div>
