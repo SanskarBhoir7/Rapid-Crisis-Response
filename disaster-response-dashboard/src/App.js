@@ -14,7 +14,9 @@ import AICopilot from './AICopilot';
 import CommandPalette from './CommandPalette';
 import ResourceCapacityBar from './ResourceCapacityBar';
 import EscalationBanner from './EscalationBanner';
+import { SpeedInsights } from "@vercel/speed-insights/react";
 import './App.css';
+
 
 // --- CONTROLS COMPONENT ---
 function MapControls({ showTraffic, setShowTraffic }) {
@@ -732,6 +734,8 @@ function App() {
       <AnimatePresence>
         {showIntro && <IntroOverlay onComplete={handleIntroComplete} />}
       </AnimatePresence>
+
+      <SpeedInsights />
 
       <div className="app-container">
         {/* ESCALATION BANNERS */}

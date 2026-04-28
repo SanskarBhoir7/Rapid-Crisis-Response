@@ -1706,6 +1706,17 @@ input:checked + .slider::before { transform: translateX(18px); }
 .progress-bar-container { margin-top: 1rem; height: 5px; border-radius: 999px; overflow: hidden; background: rgba(157, 180, 210, 0.2); }
 .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #2dd4bf, #33a1ff); }
 
+.skip-hint {
+  margin-top: 1.5rem;
+  text-align: center;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  opacity: 0.6;
+  animation: pulse-ring 2s infinite;
+}
+
 .scan-line { position: absolute; inset: 0; background: linear-gradient(180deg, transparent, rgba(51, 161, 255, 0.08), transparent); animation: scan 3.2s linear infinite; pointer-events: none; z-index: 1; }
 @keyframes scan { 0% { transform: translateY(-100%); } 100% { transform: translateY(100%); } }
 

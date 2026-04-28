@@ -50,6 +50,8 @@ export default function IntroOverlay({ onComplete }) {
             transition={{ duration: 0.8 }}
             role="status"
             aria-label="System initializing"
+            onClick={onComplete}
+            style={{ cursor: 'pointer' }}
         >
             <div className="scan-line" aria-hidden="true"></div>
             <div className="intro-grid-bg" aria-hidden="true"></div>
@@ -125,6 +127,10 @@ export default function IntroOverlay({ onComplete }) {
                         animate={{ width: `${Math.min((currentStep / (steps.length - 1)) * 100, 100)}%` }}
                         transition={{ duration: 0.5 }}
                     />
+                </div>
+
+                <div className="skip-hint">
+                    Tap anywhere to skip
                 </div>
             </div>
         </motion.div>
