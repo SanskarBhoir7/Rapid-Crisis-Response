@@ -116,7 +116,7 @@ test('renders the disaster response dashboard header', async () => {
   expect(screen.getByText(/mumbai disaster response/i)).toBeInTheDocument();
 
   await waitFor(() => {
-    expect(global.fetch).toHaveBeenCalledWith('http://127.0.0.1:5001/get_sos_data');
+    expect(global.fetch).toHaveBeenCalledWith(`${process.env.REACT_APP_API_URL || 'http://127.0.0.1:5001'}/get_sos_data`);
   });
 });
 

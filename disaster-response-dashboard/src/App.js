@@ -265,7 +265,7 @@ function App() {
   useEffect(() => {
     const fetchSituation = async () => {
       try {
-        const res = await fetch('http://127.0.0.1:5001/get_situation_update');
+        const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://127.0.0.1:5001'}/get_situation_update`);
         const data = await res.json();
         if (data.temperature) {
           setSituation({
@@ -281,7 +281,7 @@ function App() {
 
     const fetchBridgeStatus = async () => {
       try {
-        const res = await fetch('http://127.0.0.1:5001/bridge_status');
+        const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://127.0.0.1:5001'}/bridge_status`);
         if (!res.ok) return;
         const data = await res.json();
         if (data?.mode) {
@@ -297,7 +297,7 @@ function App() {
 
     const fetchSos = async () => {
       try {
-        const res = await fetch('http://127.0.0.1:5001/get_sos_data');
+        const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://127.0.0.1:5001'}/get_sos_data`);
         if (!res.ok) {
           throw new Error("Failed to connect to backend");
         }
@@ -332,7 +332,7 @@ function App() {
 
     const fetchBridgeEvents = async () => {
       try {
-        const res = await fetch('http://127.0.0.1:5001/bridge_events?limit=8');
+        const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://127.0.0.1:5001'}/bridge_events?limit=8`);
         if (!res.ok) return;
         const data = await res.json();
         if (Array.isArray(data)) {
@@ -351,7 +351,7 @@ function App() {
     // SSE connection for real-time updates
     let eventSource;
     try {
-      eventSource = new EventSource('http://127.0.0.1:5001/stream');
+      eventSource = new EventSource(`${process.env.REACT_APP_API_URL || 'http://127.0.0.1:5001'}/stream`);
       eventSource.addEventListener('connected', () => setConnected(true));
       eventSource.addEventListener('new_incident', (e) => {
         try {
@@ -392,7 +392,7 @@ function App() {
 
   const fetchRouteForVehicle = useCallback(async (vehicle, target) => {
     try {
-      const res = await fetch(`http://127.0.0.1:5001/get_route?lat=${target.coordinates.lat}&lng=${target.coordinates.lng}&start_lat=${vehicle.lat}&start_lng=${vehicle.lng}`);
+      const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://127.0.0.1:5001'}/get_route?lat=${target.coordinates.lat}&lng=${target.coordinates.lng}&start_lat=${vehicle.lat}&start_lng=${vehicle.lng}`);
       if (res.ok) {
         const data = await res.json();
         if (data.overview_polyline) {
@@ -429,7 +429,7 @@ function App() {
       payload.assigned_vehicle = options.assigned_vehicle;
     }
 
-    const res = await fetch('http://127.0.0.1:5001/update_incident_status', {
+    const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://127.0.0.1:5001'}/update_incident_status`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
@@ -576,7 +576,7 @@ function App() {
   }, []);
 
   const handleReportSubmit = async (reportData) => {
-    const res = await fetch('http://127.0.0.1:5001/report_incident', {
+    const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://127.0.0.1:5001'}/report_incident`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(reportData)
@@ -628,7 +628,7 @@ function App() {
         description: 'Silent panic button triggered. Dispatch nearest responders immediately.'
       };
 
-      const res = await fetch('http://127.0.0.1:5001/panic_alert', {
+      const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://127.0.0.1:5001'}/panic_alert`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)

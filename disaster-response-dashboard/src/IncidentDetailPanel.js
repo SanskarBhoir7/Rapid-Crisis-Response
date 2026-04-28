@@ -205,7 +205,7 @@ function TriageSection({ incidentId }) {
         setLoading(true);
         setError(false);
         try {
-            const res = await fetch(`http://127.0.0.1:5001/ai_triage/${incidentId}`);
+            const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://127.0.0.1:5001'}/ai_triage/${incidentId}`);
             if (res.ok) {
                 const data = await res.json();
                 setTriage(data);
@@ -297,7 +297,7 @@ function CommLogSection({ incidentId }) {
 
     const fetchNotes = useCallback(async () => {
         try {
-            const res = await fetch(`http://127.0.0.1:5001/incident_notes/${incidentId}`);
+            const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://127.0.0.1:5001'}/incident_notes/${incidentId}`);
             if (res.ok) {
                 const data = await res.json();
                 if (Array.isArray(data)) setNotes(data);
@@ -316,7 +316,7 @@ function CommLogSection({ incidentId }) {
         if (!msg) return;
         setSending(true);
         try {
-            const res = await fetch('http://127.0.0.1:5001/incident_notes', {
+            const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://127.0.0.1:5001'}/incident_notes`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ incident_id: incidentId, message: msg, author: 'operator' }),

@@ -54,7 +54,7 @@ export default function AnalyticsDashboard() {
     useEffect(() => {
         const fetchAnalytics = async () => {
             try {
-                const res = await fetch('http://127.0.0.1:5001/analytics');
+                const res = await fetch(`${process.env.REACT_APP_API_URL || 'http://127.0.0.1:5001'}/analytics`);
                 if (res.ok) {
                     const json = await res.json();
                     setData(json);
